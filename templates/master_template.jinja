@@ -13,6 +13,10 @@ enum Result {
 {{ rule_fn }}
 {% endfor %}
 
+{{ policy_function }}
+
 fn main() {
     let inp: Inputs = env::read();
+    let decision = evaluate_policy_{{ policy_name }}(&inp);
+    env::commit(&decision);
 }

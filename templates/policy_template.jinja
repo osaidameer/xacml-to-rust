@@ -1,0 +1,51 @@
+fn evaluate_policy_{{ policy_name }}(inp: &Inputs) -> bool {
+    let results = vec![
+        {% for rule_id in rule_ids %}
+        evaluate_rule_{{ rule_id }}(inp),
+        {% endfor %}
+    ];
+
+    {% if algorithm == "deny-overrides" or algorithm == "ordered-deny-overrides"%}
+    let atleast_one_permit = false;
+    for res in &results {
+        if *res == Result::Deny {
+            return false
+        } else if *res == Result::Permit {
+            atleast_one_permit = true;
+        }
+    }
+    return atleast_one_permit;
+    {% endif %}
+
+    {% if algorithm == "permit-overrides" or algorithm == "ordered-permit-overrides" or algorithm == "deny-unless-permit" %}
+    for res in &results {
+        if *res == Result::Permit {
+            return true
+        }
+    }
+    return false;
+    {% endif %}
+
+    {% if algorithm == "permit-unless-deny" %}
+    for res in &results {
+        if *res == Result::Deny {
+            return false
+        }
+    }
+    return true;
+    {% endif %}
+
+    {% if algorithm == "first-applicable" %}
+    for res in &results {
+        if *res == Result::Deny {
+            return false
+        }
+        if *res == Result::Permit {
+            return true
+        }
+        //continues in the case of NotApplicable, condition not needed, adding comment for clarity
+    }
+    return false;
+    {% endif %}
+
+}

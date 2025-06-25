@@ -9,6 +9,7 @@ def load_template(filename):
 
 # Prepare templates
 rule_template = load_template("rule_template.jinja")
+policy_template = load_template("policy_template.jinja")
 master_template = load_template("master_template.jinja")
 
 
@@ -40,17 +41,29 @@ def rust_operand(op):
 def generate_policy_code(ir, output_path: str):
     """Generate Rust code from an XACML policy and write to a file."""
     rule_functions = []
-
+    rule_ids = []
     for rule in ir["rules"]:
+        rule_id = rule["rule_id"].replace("-", "_")
+        rule_ids.append(rule_id)
         rendered = rule_template.render(
             target_expr=rust_expr(rule["target"]),
             cond_expr=rust_expr(rule["condition"]),
-            rule_name=rule["rule_id"].replace("-", "_"),
+            rule_name=rule_id,
             effect=rule["effect"]
         )
         rule_functions.append(rendered)
 
-    rendered_master = master_template.render(rule_functions=rule_functions)
+    policy_id = ir["policy_id"].replace("-", "_")
+    policy = policy_template.render(
+        algorithm=ir["algorithm"],
+        policy_name=policy_id,
+        rule_ids=rule_ids
+    )
+    rendered_master = master_template.render(
+        rule_functions=rule_functions,
+        policy_function=policy,
+        policy_name=policy_id,
+    )
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w") as f:

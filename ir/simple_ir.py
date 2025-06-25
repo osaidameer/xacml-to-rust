@@ -60,6 +60,7 @@ def parse_xacml_simple(xml_file: str) -> IR:
         rule = parse_rule(rule_elem, ns)
         ir["rules"].append(rule)
 
+    #print(json.dumps(ir, indent=2))
     return ir
 
 
