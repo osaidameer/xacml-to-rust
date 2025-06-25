@@ -1,0 +1,18 @@
+use policy_core::Inputs;
+use regex::Regex;
+use risc0_zkvm::guest::env;
+
+#[derive(Debug)]
+enum Result {
+    Permit,
+    Deny,
+    NotApplicable,
+}
+
+{% for rule_fn in rule_functions %}
+{{ rule_fn }}
+{% endfor %}
+
+fn main() {
+    let inp: Inputs = env::read();
+}

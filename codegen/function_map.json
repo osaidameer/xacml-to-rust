@@ -1,0 +1,141 @@
+{
+    "string-equal": "fn string_equal(a: &str, b: &str) -> bool {\n    a == b\n}\n",
+
+    "boolean-equal": "fn boolean_equal(a: bool, b: bool) -> bool {\n    a == b\n}\n",
+
+    "integer-equal": "fn integer_equal(a: i32, b: i32) -> bool {\n    a == b\n}\n",
+
+    "double-equal": "fn double_equal(a: f64, b: f64) -> bool {\n    a == b\n}\n",
+
+    "string-equal-ignore-case": "fn string_equal_ignore_case(a: &str, b: &str) -> bool {\n    a.eq_ignore_ascii_case(b)\n}\n",
+
+    "integer-add": "fn integer_add(a: i32, b: i32) -> i32 {\n    a + b\n}\n",
+
+    "double-add": "fn double_add(a: f64, b: f64) -> f64 {\n    a + b\n}\n",
+
+    "integer-subtract": "fn integer_subtract(a: i32, b: i32) -> i32 {\n    a - b\n}\n",
+
+    "double-subtract": "fn double_subtract(a: f64, b: f64) -> f64 {\n    a - b\n}\n",
+
+    "integer-multiply": "fn integer_multiply(a: i32, b: i32) -> i32 {\n    a * b\n}\n",
+
+    "double-multiply": "fn double_multiply(a: f64, b: f64) -> f64 {\n    a * b\n}\n",
+
+    "integer-divide": "fn integer_divide(a: i32, b: i32) -> Option<i32> {\n    if b == 0 {\n        None\n    } else {\n        Some(a / b)\n    }\n}\n",
+
+    "double-divide": "fn double_divide(a: f64, b: f64) -> Option<f64> {\n    if b == 0.0 {\n        None\n    } else {\n        Some(a / b)\n    }\n}\n",
+
+    "integer-mod": "fn integer_mod(a: i32, b: i32) -> Option<i32> {\n    if b == 0 {\n        None\n    } else {\n        Some(a % b)\n    }\n}\n",
+
+    "integer-abs": "fn integer_abs(a: i32) -> i32 {\n    a.abs()\n}\n",
+
+    "double-abs": "fn double_abs(a: f64) -> f64 {\n    a.abs()\n}\n",
+
+    "round": "fn round(a: f64) -> f64 {\n    a.round()\n}\n",
+
+    "floor": "fn floor(a: f64) -> f64 {\n    a.floor()\n}\n",
+
+    "string-normalize-space": "fn string_normalize_space(s: &str) -> String {\n    s.trim().to_string()\n}\n",
+
+    "string-normalize-to-lower-case": "fn string_normalize_to_lower_case(s: &str) -> String {\n    s.to_lowercase()\n}\n",
+
+    "double-to-integer": "fn double_to_integer(a: f64) -> i32 {\n    a as i32\n}\n",
+
+    "integer-to-double": "fn integer_to_double(a: i32) -> f64 {\n    a as f64\n}\n",
+
+    "integer-greater-than": "fn integer_greater_than(a: i32, b: i32) -> bool {\n    a > b\n}",
+
+    "integer-greater-than-or-equal": "fn integer_greater_than_or_equal(a: i32, b: i32) -> bool {\n    a >= b\n}",
+
+    "integer-less-than": "fn integer_less_than(a: i32, b: i32) -> bool {\n    a < b\n}",
+
+    "integer-less-than-or-equal": "fn integer_less_than_or_equal(a: i32, b: i32) -> bool {\n    a <= b\n}",
+
+    "double-greater-than": "fn double_greater_than(a: f64, b: f64) -> bool {\n    a > b\n}",
+
+    "double-greater-than-or-equal": "fn double_greater_than_or_equal(a: f64, b: f64) -> bool {\n    a >= b\n}",
+
+    "double-less-than": "fn double_less_than(a: f64, b: f64) -> bool {\n    a < b\n}",
+
+    "double-less-than-or-equal": "fn double_less_than_or_equal(a: f64, b: f64) -> bool {\n    a <= b\n}",
+
+    "string-greater-than": "fn string_greater_than(a: &str, b: &str) -> bool {\n    a > b\n}",
+
+    "string-greater-than-or-equal": "fn string_greater_than_or_equal(a: &str, b: &str) -> bool {\n    a >= b\n}",
+
+    "string-less-than": "fn string_less_than(a: &str, b: &str) -> bool {\n    a < b\n}",
+
+    "string-less-than-or-equal": "fn string_less_than_or_equal(a: &str, b: &str) -> bool {\n    a <= b\n}",
+
+    "string-one-and-only": "fn string_one_and_only(bag: &[String]) -> Option<&String> {\n    if bag.len() == 1 { Some(&bag[0]) } else { None }\n}",
+
+    "string-bag-size": "fn string_bag_size(bag: &[String]) -> usize {\n    bag.len()\n}",
+
+    "string-is-in": "fn string_is_in(value: &str, bag: &[String]) -> bool {\n    bag.iter().any(|item| item == value)\n}",
+
+    "string-bag": "fn string_bag(values: Vec<String>) -> Vec<String> {\n    values\n}",
+
+    "boolean-one-and-only": "fn boolean_one_and_only(bag: &[bool]) -> Option<bool> {\n    if bag.len() == 1 { Some(bag[0]) } else { None }\n}",
+
+    "boolean-bag-size": "fn boolean_bag_size(bag: &[bool]) -> usize {\n    bag.len()\n}",
+
+    "boolean-is-in": "fn boolean_is_in(value: bool, bag: &[bool]) -> bool {\n    bag.iter().any(|&item| item == value)\n}",
+
+    "boolean-bag": "fn boolean_bag(values: Vec<bool>) -> Vec<bool> {\n    values\n}",
+
+    "integer-one-and-only": "fn integer_one_and_only(bag: &[i64]) -> Option<i64> {\n    if bag.len() == 1 { Some(bag[0]) } else { None }\n}",
+
+    "integer-bag-size": "fn integer_bag_size(bag: &[i64]) -> usize {\n    bag.len()\n}",
+
+    "integer-is-in": "fn integer_is_in(value: i64, bag: &[i64]) -> bool {\n    bag.iter().any(|&item| item == value)\n}",
+
+    "integer-bag": "fn integer_bag(values: Vec<i64>) -> Vec<i64> {\n    values\n}",
+
+    "double-one-and-only": "fn double_one_and_only(bag: &[f64]) -> Option<f64> {\n    if bag.len() == 1 { Some(bag[0]) } else { None }\n}",
+
+    "double-bag-size": "fn double_bag_size(bag: &[f64]) -> usize {\n    bag.len()\n}",
+
+    "double-is-in": "fn double_is_in(value: f64, bag: &[f64]) -> bool {\n    bag.iter().any(|&item| item == value)\n}",
+
+    "double-bag": "fn double_bag(values: Vec<f64>) -> Vec<f64> {\n    values\n}",
+
+    "string-concatenate": "fn string_concatenate(parts: &[&str]) -> String {\n    parts.concat()\n}",
+
+    "boolean-from-string": "fn boolean_from_string(s: &str) -> bool {\n    match s.to_lowercase().as_str() {\n        \"true\" => true,\n        \"false\" => false,\n        _ => false,\n    }\n}",
+
+    "string-from-boolean": "fn string_from_boolean(b: bool) -> String {\n    b.to_string()\n}",
+
+    "integer-from-string": "fn integer_from_string(s: &str) -> Option<i64> {\n    s.parse::<i64>().ok()\n}",
+
+    "string-from-integer": "fn string_from_integer(value: i32) -> String {\n    value.to_string()\n}",
+
+    "double-from-string": "fn double_from_string(value: &str) -> Option<f64> {\n    value.parse::<f64>().ok()\n}",
+
+    "string-from-double": "fn string_from_double(value: f64) -> String {\n    value.to_string()\n}",
+
+    "string-starts-with": "fn string_starts_with(value: &str, prefix: &str) -> bool {\n    value.starts_with(prefix)\n}",
+    
+    "string-ends-with": "fn string_ends_with(value: &str, suffix: &str) -> bool {\n    value.ends_with(suffix)\n}",
+
+    "string-contains": "fn string_contains(a: &str, b: &str) -> bool {\n    a.contains(b)\n}",
+
+    "string-substring": "fn string_substring(a: &str, start: usize, length: usize) -> &str {\n    let end = start + length;\n    &a[start..end]\n}",
+
+    "rfc822Name-equal": "fn rfc822_name_equal(a: &str, b: &str) -> bool {\n    if let (Some((local_a, domain_a)), Some((local_b, domain_b))) = (a.split_once('@'), b.split_once('@')) {\n        local_a == local_b && domain_a.eq_ignore_ascii_case(domain_b)\n    } else {\n        false\n    }\n}",
+
+    "hexBinary-equal": "fn hex_binary_equal(a: &str, b: &str) -> bool {\n    let decode = |s: &str| hex::decode(s).ok();\n    match (decode(a), decode(b)) {\n        (Some(bytes_a), Some(bytes_b)) => bytes_a == bytes_b,\n        _ => false,\n    }\n}",
+
+    "base64Binary-equal": "fn base64_binary_equal(a: &str, b: &str) -> bool {\n    let decode = |s: &str| base64::decode(s).ok();\n    match (decode(a), decode(b)) {\n        (Some(bytes_a), Some(bytes_b)) => bytes_a == bytes_b,\n        _ => false,\n    }\n}"
+
+}
+
+
+"anyURI-equal": "fn anyuri_equal(a: &str, b: &str) -> bool {\n    a == b\n}\n",
+
+"rfc822Name-equal": "fn rfc822name_equal(a: &str, b: &str) -> bool {\n    a.eq_ignore_ascii_case(b)\n}\n",
+
+"hexBinary-equal": "fn hex_binary_equal(a: &[u8], b: &[u8]) -> bool {\n    a == b\n}\n",
+
+"base64Binary-equal": "fn base64_binary_equal(a: &[u8], b: &[u8]) -> bool {\n    a == b\n}\n",
+
+
