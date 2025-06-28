@@ -15,6 +15,7 @@ fn evaluate_policy_{{ policy_name }}(inp: &Inputs) -> bool {
     ];
 
     {% if algorithm == "deny-overrides" or algorithm == "ordered-deny-overrides"%}
+    //deny-overrides
     let atleast_one_permit = false;
     for res in &results {
         if *res == Result::Deny {
@@ -27,6 +28,7 @@ fn evaluate_policy_{{ policy_name }}(inp: &Inputs) -> bool {
     {% endif %}
 
     {% if algorithm == "permit-overrides" or algorithm == "ordered-permit-overrides" or algorithm == "deny-unless-permit" %}
+    //permit-overrides || deny-unless-permit
     for res in &results {
         if *res == Result::Permit {
             return true
@@ -36,6 +38,7 @@ fn evaluate_policy_{{ policy_name }}(inp: &Inputs) -> bool {
     {% endif %}
 
     {% if algorithm == "permit-unless-deny" %}
+    //permit-unless-deny
     for res in &results {
         if *res == Result::Deny {
             return false
@@ -45,6 +48,7 @@ fn evaluate_policy_{{ policy_name }}(inp: &Inputs) -> bool {
     {% endif %}
 
     {% if algorithm == "first-applicable" %}
+    //first-applicable
     for res in &results {
         if *res == Result::Deny {
             return false

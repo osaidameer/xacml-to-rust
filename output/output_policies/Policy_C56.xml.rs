@@ -10,8 +10,12 @@ enum Result {
 }
 
 fn evaluate_cond_rule(inp: &Inputs) -> bool {
-    (Regex::new("J.* Hibbert").unwrap().is_match(&inp.subject_id))
-        || (Regex::new("B.* Simpson").unwrap().is_match(&inp.subject_id))
+    (Regex::new(r"J.* Hibbert")
+        .unwrap()
+        .is_match(&inp.subject_id))
+        || (Regex::new(r"B.* Simpson")
+            .unwrap()
+            .is_match(&inp.subject_id))
 }
 
 fn evaluate_rule_rule(inp: &Inputs) -> Result {

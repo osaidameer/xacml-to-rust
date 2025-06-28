@@ -19,7 +19,7 @@ def rust_expr(node):
     if node["op"] == "regex":
         pattern = rust_operand(node["left"])
         string_to_match = rust_operand(node["right"])
-        return f'Regex::new({pattern}).unwrap().is_match(&{string_to_match})'
+        return f'Regex::new(r{pattern}).unwrap().is_match(&{string_to_match})'
     if node["op"] in {"AND", "OR"}:
         joiner = " && " if node["op"] == "AND" else " || "
         return f"({joiner.join(rust_expr(child) for child in node['children'])})"

@@ -20,6 +20,9 @@ def extract_inputs_from_policy(xml_file):
     inputs = {}
 
     for elem in root.iter():
+        #print(f"DEBUG: {elem} | tag type: {type(elem.tag)}")
+        if not isinstance(elem.tag, str):
+            continue
         tag = strip_tag(elem.tag)
         if tag == "AttributeDesignator":
             attr_id = elem.attrib.get("AttributeId", "").strip()
@@ -71,6 +74,6 @@ def generate_input_struct(xml_path: str, output_path: str):
 
 # Optional standalone run
 if __name__ == "__main__":
-    input_xml = "../policies/Policy_D01.xml"
+    input_xml = "../policies/example_input.xml"
     output_file = f"inputs_{os.path.basename(input_xml).replace('.xml', '.rs')}"
     generate_input_struct(input_xml, output_file)

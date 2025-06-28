@@ -127,8 +127,12 @@ def parse_match(match_elem, ns) -> Dict:
     if attr_value_elem is None or attr_designator_elem is None:
         raise ValueError("Invalid Match: missing AttributeValue or AttributeDesignator")
 
-    left = parse_operand(attr_designator_elem, ns)
-    right = parse_operand(attr_value_elem, ns)
+    children = list(match_elem)
+    if len(children) != 2:
+        raise ValueError(f"Invalid Match: expected 2 children, got {len(children)}")
+
+    left = parse_operand(children[0], ns)
+    right = parse_operand(children[1], ns)
 
     return {
         "op": op_symbol,
