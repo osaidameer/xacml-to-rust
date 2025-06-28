@@ -1,5 +1,4 @@
 from lxml import etree
-from dataclasses import dataclass, asdict
 from typing import Dict, List, Union, Optional
 import json
 
@@ -15,7 +14,11 @@ comparisons = {
     "add": "+",
     "multiply": "*",
     "divide": "/",
-    "regexp": "regex"
+    "regexp-match": "regex",
+    "or": "||",
+    "and": "&&",
+    "not": "!",
+    "mod": "%"
 }
 
 IR = Dict[str, Union[str, List[Dict]]] # Type alias for the IR
@@ -60,7 +63,7 @@ def parse_xacml_simple(xml_file: str) -> IR:
         rule = parse_rule(rule_elem, ns)
         ir["rules"].append(rule)
 
-    #print(json.dumps(ir, indent=2))
+    print(json.dumps(ir, indent=2))
     return ir
 
 
@@ -105,18 +108,17 @@ def parse_match(match_elem, ns) -> Dict:
     """
     Parse a <Match> element into a comparison using the standard `comparisons` mapping.
     """
-    match_id_raw = match_elem.get("MatchId")
-    match_id = simplify_urn(match_id_raw)
+    match_id = match_elem.get("MatchId")
 
     # Map the MatchId to a comparison operator
     op_symbol = None
     for key, symbol in comparisons.items():
-        if key in match_id:
+        if match_id.endswith(f"{key}"):
             op_symbol = symbol
             break
 
     if op_symbol is None:
-        raise ValueError(f"Unsupported MatchId: {match_id_raw}")
+        raise ValueError(f"Unsupported MatchId: {match_id}")
 
     # Extract the operands
     attr_value_elem = match_elem.find("xacml:AttributeValue", namespaces=ns)
@@ -190,8 +192,17 @@ def parse_apply(apply_elem, ns) -> Dict:
         return parse_operand(children[0], ns)
 
     # Check for comparison operators (both partial and full URN matches)
+    simplified_function_id = simplify_urn(function_id)
+    if comparisons.get(simplified_function_id, None) is not None:
+        return {
+            "op": comparisons[simplified_function_id],
+            "left": parse_operand(children[0], ns),
+            "right": parse_operand(children[1], ns)
+        }
+
     for op_name, op_symbol in comparisons.items():
-        if op_name in function_id:
+        #print(function_id)
+        if function_id.endswith(f"{op_name}"):
             return {
                 "op": op_symbol,
                 "left": parse_operand(children[0], ns),
@@ -230,7 +241,7 @@ def parse_operand(elem, ns) -> Dict:
 
 if __name__ == "__main__":
     # Parse XACML file
-    ir = parse_xacml_simple("../policies/Policy_A01.xml")
+    ir = parse_xacml_simple("../policies/Policy_D01.xml")
 
     print(json.dumps(ir, indent=2))
 

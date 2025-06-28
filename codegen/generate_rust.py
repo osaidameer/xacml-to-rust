@@ -16,6 +16,10 @@ master_template = load_template("master_template.jinja")
 def rust_expr(node):
     if node is None:
         return None
+    if node["op"] == "regex":
+        pattern = rust_operand(node["left"])
+        string_to_match = rust_operand(node["right"])
+        return f'Regex::new({pattern}).unwrap().is_match(&{string_to_match})'
     if node["op"] in {"AND", "OR"}:
         joiner = " && " if node["op"] == "AND" else " || "
         return f"({joiner.join(rust_expr(child) for child in node['children'])})"
@@ -31,7 +35,7 @@ def rust_operand(op):
     if op["type"] == "attribute":
         return f"inp.{op['id'].replace('-', '_')}"
     elif op["type"] == "value":
-        if op["data_type"] in {"string", "anyURI"}:
+        if op["data_type"] in {"string", "anyURI", "date", "time", "dateTime"}:
             return f'"{op["value"]}"'
         return str(op["value"])
     else:
@@ -55,6 +59,7 @@ def generate_policy_code(ir, output_path: str):
 
     policy_id = ir["policy_id"].replace("-", "_")
     policy = policy_template.render(
+        target_expr=rust_expr(ir["target"]),
         algorithm=ir["algorithm"],
         policy_name=policy_id,
         rule_ids=rule_ids

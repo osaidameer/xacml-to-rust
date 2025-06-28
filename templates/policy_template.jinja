@@ -1,4 +1,13 @@
+fn evaluate_target_{{ policy_name }}(inp: &Inputs) -> bool {
+    {{ target_expr }}
+}
+
 fn evaluate_policy_{{ policy_name }}(inp: &Inputs) -> bool {
+    {% if target_condition %}
+    if !evaluate_target_{{ rule_name }}(inp) {
+        return false;
+    {% endif %}
+
     let results = vec![
         {% for rule_id in rule_ids %}
         evaluate_rule_{{ rule_id }}(inp),
