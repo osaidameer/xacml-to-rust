@@ -25,13 +25,10 @@ fn main() {
     {% if policyset_function %}
     let decision = evaluate_policyset_{{ policyset_name }}(&inp);
     {% else %}
-    let mut decision = false;
-    let intermediate = evaluate_policy_{{ policy_name }}(&inp);
-    if *intermediate == Result::Permit {
-        decision = true;
-    } else {
-        decision = false;
-    }
+    let decision = match evaluate_policy_policy(&inp) {
+        Result::Permit => true,
+        _ => false,
+    };
     {% endif %}
 
     env::commit(&decision);
