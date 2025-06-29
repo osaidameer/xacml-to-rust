@@ -25,7 +25,7 @@ fn main() {
     {% if policyset_function %}
     let decision = evaluate_policyset_{{ policyset_name }}(&inp);
     {% else %}
-    let decision = false;
+    let mut decision = false;
     let intermediate = evaluate_policy_{{ policy_name }}(&inp);
     if *intermediate == Result::Permit {
         decision = true;

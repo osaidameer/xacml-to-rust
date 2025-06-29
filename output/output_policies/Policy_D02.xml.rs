@@ -59,14 +59,14 @@ fn evaluate_rule_policy_rule3(inp: &Inputs) -> Result {
 
 fn evaluate_policy_policy(inp: &Inputs) -> Result {
     let results = vec![
-        evaluate_rule_rule1(inp),
-        evaluate_rule_rule2(inp),
-        evaluate_rule_rule4(inp),
-        evaluate_rule_rule3(inp),
+        evaluate_rule_policy_rule1(inp),
+        evaluate_rule_policy_rule2(inp),
+        evaluate_rule_policy_rule4(inp),
+        evaluate_rule_policy_rule3(inp),
     ];
 
     //deny-overrides
-    let atleast_one_permit = false;
+    let mut atleast_one_permit = false;
     for res in &results {
         if *res == Result::Deny {
             return Result::Deny;
