@@ -32,9 +32,11 @@ def simplify_urn(urn: str) -> str:
 def create_ir() -> IR:
     """Initialize the IR structure."""
     return {
-        "policy_id": "",
+        "type": "",
+        "id": "",
         "algorithm": "",
-        "target": {"subjects": [], "resources": [], "actions": [], "environments": []},
+        "target": None,
+        "policies": [],
         "rules": []
     }
 
@@ -50,21 +52,46 @@ def parse_xacml_simple(xml_file: str) -> IR:
     }
 
     ir = create_ir()
-    ir["policy_id"] = simplify_urn(root.get("PolicyId"))
-    ir["algorithm"] = simplify_urn(root.get("RuleCombiningAlgId"))
+    root_tag = etree.QName(root.tag).localname
 
-    # Parse Policy Target
-    target_elem = root.find(".//xacml:Target", namespaces=ns)
-    if target_elem is not None:
-        ir["target"] = parse_target(target_elem, ns)
+    if root_tag == "PolicySet":
+        ir["type"] = "PolicySet"
+        ir["id"] = simplify_urn(root.get("PolicySetId"))
+        ir["algorithm"] = simplify_urn(root.get("PolicyCombiningAlgId"))
 
-    # Parse Rules
-    for rule_elem in root.findall(".//xacml:Rule", namespaces=ns):
-        rule = parse_rule(rule_elem, ns)
-        ir["rules"].append(rule)
+        # Parse PolicySet Target
+        target_elem = root.find(".//xacml:Target", namespaces=ns)
+        if target_elem is not None:
+            ir["target"] = parse_target(target_elem, ns)
+
+        for policy_elem in root.findall(".//xacml:Policy", namespaces=ns):
+            ir["policies"].append(parse_policy(policy_elem, ns))
+
+    elif root_tag == "Policy":
+        ir = parse_policy(root, ns)
+
+    else:
+        raise ValueError(f"Unexpected root element: {root_tag}")
 
     print(json.dumps(ir, indent=2))
     return ir
+
+
+def parse_policy(policy_elem, ns) -> Optional[Dict]:
+    policy_ir = create_ir()
+    policy_ir["type"] = "Policy"
+    policy_ir["id"] = simplify_urn(policy_elem.get("PolicyId"))
+    policy_ir["algorithm"] = simplify_urn(policy_elem.get("RuleCombiningAlgId"))
+
+    target_elem = policy_elem.find("xacml:Target", namespaces=ns)
+    if target_elem is not None:
+        policy_ir["target"] = parse_target(target_elem, ns)
+
+    for rule_elem in policy_elem.findall("xacml:Rule", namespaces=ns):
+        rule_ir = parse_rule(rule_elem, ns)
+        policy_ir["rules"].append(rule_ir)
+
+    return policy_ir
 
 
 def parse_target(target_elem, ns) -> Optional[Dict]:
@@ -245,7 +272,7 @@ def parse_operand(elem, ns) -> Dict:
 
 if __name__ == "__main__":
     # Parse XACML file
-    ir = parse_xacml_simple("../policies/Policy_D01.xml")
+    ir = parse_xacml_simple("../policies/Policy_D13.xml")
 
     print(json.dumps(ir, indent=2))
 

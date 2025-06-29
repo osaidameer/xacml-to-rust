@@ -1,18 +1,18 @@
 {% if target_expr %}
-fn evaluate_target_{{ rule_name }}(inp: &Inputs) -> bool {
+fn evaluate_target_{{ policy_name }}_{{ rule_name }}(inp: &Inputs) -> bool {
     {{ target_expr }}
 }
 {% endif %}
 
 {% if cond_expr %}
-fn evaluate_cond_{{ rule_name }}(inp: &Inputs) -> bool {
+fn evaluate_cond_{{ policy_name }}_{{ rule_name }}(inp: &Inputs) -> bool {
     {{ cond_expr }}
 }
 {% endif %}
 
-fn evaluate_rule_{{ rule_name }}(inp: &Inputs) -> Result {
+fn evaluate_rule_{{ policy_name }}_{{ rule_name }}(inp: &Inputs) -> Result {
     {% if target_expr %}
-    if !evaluate_target_{{ rule_name }}(inp) {
+    if !evaluate_target_{{ policy_name }}_{{ rule_name }}(inp) {
         return Result::NotApplicable;
     }
     {% endif %}
@@ -22,7 +22,7 @@ fn evaluate_rule_{{ rule_name }}(inp: &Inputs) -> Result {
     {% endif %}
 
     {% if cond_expr %}
-    if evaluate_cond_{{ rule_name }}(inp) {
+    if evaluate_cond_{{ policy_name }}_{{ rule_name }}(inp) {
         return Result::{{ effect }};
     } else {
         return Result::NotApplicable;

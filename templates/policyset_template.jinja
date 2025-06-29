@@ -1,22 +1,22 @@
 {#
-    Consider return Result as value from Policy function rather than bool, as less changes required to current
-    implementation if PolicySet is present. Final output can be resolved in main instead.
+    Copied over from original policy_template, modified policy_template to return Result instead
+    Thus, policyset evaluation can remain unchanged
 #}
 {% if target_expr %}
-fn evaluate_target_{{ policy_name }}(inp: &Inputs) -> bool {
+fn evaluate_target_{{ policyset_name }}(inp: &Inputs) -> bool {
     {{ target_expr }}
 }
 {% endif %}
 
-fn evaluate_policy_{{ policy_name }}(inp: &Inputs) -> Result {
+fn evaluate_policyset_{{ policyset_name }}(inp: &Inputs) -> bool {
     {% if target_expr %}
-    if !evaluate_target_{{ policy_name }}(inp) {
+    if !evaluate_target_{{ policyset_name }}(inp) {
         return false;
     {% endif %}
 
     let results = vec![
-        {% for rule_id in rule_ids %}
-        evaluate_rule_{{ policy_name }}_{{ rule_id }}(inp),
+        {% for policy_id in policy_ids %}
+        evaluate_policy_{{ policy_id }}(inp),
         {% endfor %}
     ];
 
@@ -25,51 +25,46 @@ fn evaluate_policy_{{ policy_name }}(inp: &Inputs) -> Result {
     let mut atleast_one_permit = false;
     for res in &results {
         if *res == Result::Deny {
-            return Result::Deny
+            return false
         } else if *res == Result::Permit {
             atleast_one_permit = true;
         }
     }
-    if atleast_one_permit {
-        return Result::Permit
-    }
-    return Result::NotApplicable
+    return atleast_one_permit;
     {% endif %}
 
     {% if algorithm == "permit-overrides" or algorithm == "ordered-permit-overrides" or algorithm == "deny-unless-permit" %}
     //permit-overrides || deny-unless-permit
-    let mut atleast_one_deny = false;
     for res in &results {
         if *res == Result::Permit {
-            return Result::Permit
-        } else if *res == Result::Deny {
-            atleast_one_deny = true;
+            return true
         }
     }
-    if atleast_one_deny {
-        return Result::Deny;
-    }
-    return Result::NotApplicable;
+    return false;
     {% endif %}
 
     {% if algorithm == "permit-unless-deny" %}
     //permit-unless-deny
     for res in &results {
         if *res == Result::Deny {
-            return Result::Deny;
+            return false
         }
     }
-    return Result::Permit;
+    return true;
     {% endif %}
 
     {% if algorithm == "first-applicable" %}
     //first-applicable
     for res in &results {
-        if *res != Result::NotApplicable {
-            return *res;
+        if *res == Result::Deny {
+            return false
         }
+        if *res == Result::Permit {
+            return true
+        }
+        //continues in the case of NotApplicable, condition not needed, adding comment for clarity
     }
-    return Result::NotApplicable;
+    return false;
     {% endif %}
 
 }

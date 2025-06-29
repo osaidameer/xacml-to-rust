@@ -13,10 +13,26 @@ enum Result {
 {{ rule_fn }}
 {% endfor %}
 
-{{ policy_function }}
+{% for policy_fn in policy_functions %}
+{{ policy_fn }}
+{% endfor %}
+
+{{ policyset_function }}
 
 fn main() {
     let inp: Inputs = env::read();
-    let decision = evaluate_policy_{{ policy_name }}(&inp);
+
+    {% if policyset_function %}
+    let decision = evaluate_policyset_{{ policyset_name }}(&inp);
+    {% else %}
+    let decision = false;
+    let intermediate = evaluate_policy_{{ policy_name }}(&inp);
+    if *intermediate == Result::Permit {
+        decision = true;
+    } else {
+        decision = false;
+    }
+    {% endif %}
+
     env::commit(&decision);
 }

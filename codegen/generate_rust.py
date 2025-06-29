@@ -10,6 +10,7 @@ def load_template(filename):
 # Prepare templates
 rule_template = load_template("rule_template.jinja")
 policy_template = load_template("policy_template.jinja")
+policyset_template = load_template("policyset_template.jinja")
 master_template = load_template("master_template.jinja")
 
 
@@ -42,33 +43,79 @@ def rust_operand(op):
         raise ValueError(f"Unsupported operand type: {op['type']}")
 
 
-def generate_policy_code(ir, output_path: str):
-    """Generate Rust code from an XACML policy and write to a file."""
+def render_rule(rule, policy_id):
+    rule_id = rule["rule_id"].replace("-","_")
+    return rule_id, rule_template.render(
+        policy_name=policy_id,
+        target_expr=rust_expr(rule["target"]),
+        cond_expr=rust_expr(rule["condition"]),
+        rule_name=rule_id,
+        effect=rule["effect"]
+    )
+
+
+def render_policy(policy):
     rule_functions = []
     rule_ids = []
-    for rule in ir["rules"]:
-        rule_id = rule["rule_id"].replace("-", "_")
+    policy_id = policy["id"].replace("-","_")
+    for rule in policy["rules"]:
+        rule_id, rule_fn = render_rule(rule, policy_id)
         rule_ids.append(rule_id)
-        rendered = rule_template.render(
-            target_expr=rust_expr(rule["target"]),
-            cond_expr=rust_expr(rule["condition"]),
-            rule_name=rule_id,
-            effect=rule["effect"]
-        )
-        rule_functions.append(rendered)
+        rule_functions.append(rule_fn)
 
-    policy_id = ir["policy_id"].replace("-", "_")
-    policy = policy_template.render(
-        target_expr=rust_expr(ir["target"]),
-        algorithm=ir["algorithm"],
+    policy_id = policy["id"].replace("-", "_")
+    policy_fn = policy_template.render(
+        target_expr=rust_expr(policy["target"]),
+        algorithm=policy["algorithm"],
         policy_name=policy_id,
         rule_ids=rule_ids
     )
-    rendered_master = master_template.render(
-        rule_functions=rule_functions,
-        policy_function=policy,
-        policy_name=policy_id,
-    )
+
+    return policy_id, rule_functions, policy_fn
+
+
+def generate_policy_code(ir, output_path: str):
+    """Generate Rust code from an XACML policy and write to a file."""
+    rule_functions = []
+    policy_functions = []
+    policyset_fn = ""
+    policy_ids = []
+
+    if ir["type"] == "Policy":
+        policy_id, rule_functions, policy_fn = render_policy(ir)
+        rendered_master = master_template.render(
+            rule_functions=rule_functions,
+            policy_functions=[policy_fn],
+            policy_name=policy_id,
+            policyset_function="",
+            policyset_name=""
+        )
+    elif ir["type"] == "PolicySet":
+        for policy in ir["policies"]:
+            policy_id, rule_fns, policy_fn = render_policy(policy)
+            policy_ids.append(policy_id)
+            policy_functions.append(policy_fn)
+            rule_functions.extend(rule_fns)
+
+        policyset_name = ir["id"].replace("-", "_")
+        policyset_fn = policyset_template.render(
+            target_expr=rust_expr(ir["target"]),
+            policy_ids=policy_ids,
+            algorithm=ir["algorithm"],
+            policyset_name=policyset_name
+        )
+
+        rendered_master = master_template.render(
+            rule_functions=rule_functions,
+            policy_functions=policy_functions,
+            policyset_function=policyset_fn,
+            policy_name="",
+            policyset_name=policyset_name,
+            algorithm=ir["algorithm"]
+        )
+
+    else:
+        raise ValueError(f"Unsupported Parent Type {ir['type']}")
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w") as f:
