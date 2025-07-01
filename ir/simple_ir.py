@@ -2,7 +2,10 @@ from lxml import etree
 from typing import Dict, List, Union, Optional
 import json
 
-# Standard comparison functions
+"""
+Standard comparison and arithmetic functions. Currently missing duration, bag, set, string manipulation, and type 
+conversion functions
+"""
 comparisons = {
     "greater-than-or-equal": ">=",
     "greater-than": ">",
@@ -21,7 +24,7 @@ comparisons = {
     "mod": "%"
 }
 
-IR = Dict[str, Union[str, List[Dict]]] # Type alias for the IR
+IR = Dict[str, Union[str, List[Dict], Dict, None]]
 
 def simplify_urn(urn: str) -> str:
     if '#' in urn:
@@ -31,6 +34,7 @@ def simplify_urn(urn: str) -> str:
 
 def create_ir() -> IR:
     """Initialize the IR structure."""
+    # Added type support to incorporate PolicySets
     return {
         "type": "",
         "id": "",
@@ -54,6 +58,8 @@ def parse_xacml_simple(xml_file: str) -> IR:
     ir = create_ir()
     root_tag = etree.QName(root.tag).localname
 
+    # If PolicySet, parse through all child policies, otherwise follow original flow of parsing a single policy
+    # Currently assuming that no PolicySets will be nested inside a PolicySet (no existing test cases either)
     if root_tag == "PolicySet":
         ir["type"] = "PolicySet"
         ir["id"] = simplify_urn(root.get("PolicySetId"))
@@ -73,7 +79,7 @@ def parse_xacml_simple(xml_file: str) -> IR:
     else:
         raise ValueError(f"Unexpected root element: {root_tag}")
 
-    print(json.dumps(ir, indent=2))
+    #print(json.dumps(ir, indent=2))
     return ir
 
 
@@ -99,9 +105,10 @@ def parse_target(target_elem, ns) -> Optional[Dict]:
     Parse a <Target> element into symbolic logic tree IR.
     Returns None if the target is empty (i.e., matches all).
     """
+    # catching case of empty target, "None" used later in the codegen to not render a target function if not required
     anyof_elems = target_elem.findall("xacml:AnyOf", namespaces=ns)
     if not anyof_elems:
-        return None  # Target with no AnyOf means "match all"
+        return None
 
     return {
         "op": "AND",
@@ -110,9 +117,7 @@ def parse_target(target_elem, ns) -> Optional[Dict]:
 
 
 def parse_anyof(anyof_elem, ns) -> Dict:
-    """
-    Parse an <AnyOf> element into an OR expression of AllOfs.
-    """
+    """Parse an <AnyOf> element into an OR expression of AllOfs."""
     allof_elems = anyof_elem.findall("xacml:AllOf", namespaces=ns)
     return {
         "op": "OR",
@@ -121,9 +126,7 @@ def parse_anyof(anyof_elem, ns) -> Dict:
 
 
 def parse_allof(allof_elem, ns) -> Dict:
-    """
-    Parse an <AllOf> element into an AND expression of Matches.
-    """
+    """Parse an <AllOf> element into an AND expression of Matches."""
     match_elems = allof_elem.findall("xacml:Match", namespaces=ns)
     return {
         "op": "AND",
@@ -132,9 +135,7 @@ def parse_allof(allof_elem, ns) -> Dict:
 
 
 def parse_match(match_elem, ns) -> Dict:
-    """
-    Parse a <Match> element into a comparison using the standard `comparisons` mapping.
-    """
+    """Parse a <Match> element into a comparison using the standard `comparisons` mapping."""
     match_id = match_elem.get("MatchId")
 
     # Map the MatchId to a comparison operator
@@ -155,6 +156,7 @@ def parse_match(match_elem, ns) -> Dict:
         raise ValueError("Invalid Match: missing AttributeValue or AttributeDesignator")
 
     children = list(match_elem)
+    # enforcing length of children in match, accordingly to XACML 3.0 spec, no nesting allowed in match
     if len(children) != 2:
         raise ValueError(f"Invalid Match: expected 2 children, got {len(children)}")
 
@@ -212,17 +214,20 @@ def parse_condition(condition_elem, ns) -> Optional[Dict]:
 
 
 def parse_apply(apply_elem, ns) -> Dict:
-    """Recursively parse Apply/Condition logic with XACML 3.0 support."""
+    """Recursively parse Apply/Condition logic"""
     function_id = apply_elem.get("FunctionId")
     children = list(apply_elem)
 
-    # Skip one-and-only functions (just pass through the first child)
+    # Skipping one-and-only functions for simplicity right now, no bag implementation yet (just pass through the first child)
     if "one-and-only" in function_id:
         if len(children) != 1:
             raise ValueError(f"one-and-only requires exactly 1 argument, got {len(children)}")
         return parse_operand(children[0], ns)
 
-    # Check for comparison operators (both partial and full URN matches)
+    """
+    Checking for complete matches as operations like "equal" "or" "and" are also part of other functions, can't use "in"
+    thus returning early through exact match if found
+    """
     simplified_function_id = simplify_urn(function_id)
     if comparisons.get(simplified_function_id, None) is not None:
         return {
@@ -240,19 +245,20 @@ def parse_apply(apply_elem, ns) -> Dict:
                 "right": parse_operand(children[1], ns)
             }
 
-    # If we get here, it's an unsupported function that we can't ignore
+    # Catch error for unsupported functions
     raise ValueError(f"Unsupported XACML function (and not one-and-only): {function_id}")
 
 
-def parse_operand(elem, ns) -> Dict:
-    """Parse an operand with support for nested Apply elements."""
+def parse_operand(elem, ns) -> Optional[Dict]:
     if elem is None:
         return None
 
-    tag = elem.tag.split('}')[-1]  # Remove namespace prefix
+    tag = elem.tag.split('}')[-1]
 
     if tag == "Apply":
         return parse_apply(elem, ns)
+    # used to distinguish between literals and attributes to be picked from request. Currently NO support for AttributeSelector
+    # as AttributeSelector uses xpath
     elif tag == "AttributeValue":
         return {
             "type": "value",
@@ -271,7 +277,6 @@ def parse_operand(elem, ns) -> Dict:
 
 
 if __name__ == "__main__":
-    # Parse XACML file
     ir = parse_xacml_simple("../policies/Policy_D13.xml")
 
     print(json.dumps(ir, indent=2))

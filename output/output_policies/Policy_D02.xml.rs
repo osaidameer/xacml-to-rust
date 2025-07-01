@@ -83,13 +83,10 @@ fn evaluate_policy_policy(inp: &Inputs) -> Result {
 fn main() {
     let inp: Inputs = env::read();
 
-    let decision = false;
-    let intermediate = evaluate_policy_policy(&inp);
-    if *intermediate == Result::Permit {
-        decision = true;
-    } else {
-        decision = false;
-    }
+    let decision = match evaluate_policy_policy(&inp) {
+        Result::Permit => true,
+        _ => false,
+    };
 
     env::commit(&decision);
 }

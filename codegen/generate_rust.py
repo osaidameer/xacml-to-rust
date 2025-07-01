@@ -1,6 +1,7 @@
 from jinja2 import Template
 import subprocess
 import os
+import re
 
 # Load external templates
 def load_template(filename):
@@ -34,7 +35,7 @@ def rust_operand(op):
     if "op" in op and "type" not in op:
         return f"({rust_expr(op)})"
     if op["type"] == "attribute":
-        return f"inp.{op['id'].replace('-', '_')}"
+        return f"inp.{re.sub(r'[^a-zA-Z0-9_]', '_', op['id'])}"
     elif op["type"] == "value":
         if op["data_type"] in {"string", "anyURI", "date", "time", "dateTime"}:
             return f'"{op["value"]}"'
@@ -54,16 +55,16 @@ def render_rule(rule, policy_id):
     )
 
 
+# separated policy rendering function from original function to support PolicySet
 def render_policy(policy):
     rule_functions = []
     rule_ids = []
-    policy_id = policy["id"].replace("-","_")
+    policy_id = re.sub(r'[^a-zA-Z0-9_]', '_', policy['id'])
     for rule in policy["rules"]:
         rule_id, rule_fn = render_rule(rule, policy_id)
         rule_ids.append(rule_id)
         rule_functions.append(rule_fn)
 
-    policy_id = policy["id"].replace("-", "_")
     policy_fn = policy_template.render(
         target_expr=rust_expr(policy["target"]),
         algorithm=policy["algorithm"],
@@ -75,7 +76,6 @@ def render_policy(policy):
 
 
 def generate_policy_code(ir, output_path: str):
-    """Generate Rust code from an XACML policy and write to a file."""
     rule_functions = []
     policy_functions = []
     policyset_fn = ""
@@ -97,7 +97,7 @@ def generate_policy_code(ir, output_path: str):
             policy_functions.append(policy_fn)
             rule_functions.extend(rule_fns)
 
-        policyset_name = ir["id"].replace("-", "_")
+        policyset_name = re.sub(r'[^a-zA-Z0-9_]', '_', ir["id"])
         policyset_fn = policyset_template.render(
             target_expr=rust_expr(ir["target"]),
             policy_ids=policy_ids,

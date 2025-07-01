@@ -1,5 +1,6 @@
 from lxml import etree as ET
 import os
+import re
 
 def strip_tag(tag):
     return tag.split('}')[-1] if '}' in tag else tag
@@ -28,7 +29,7 @@ def extract_inputs_from_policy(xml_file):
             attr_id = elem.attrib.get("AttributeId", "").strip()
             data_type = elem.attrib.get("DataType", "").strip()
             if attr_id and data_type:
-                name = attr_id.split(":")[-1].replace("-", "_")
+                name = re.sub(r'[^a-zA-Z0-9_]', '_', attr_id.split(":")[-1])
                 inputs[name] = data_type
 
     return [{"name": name, "data_type": dtype} for name, dtype in inputs.items()]
