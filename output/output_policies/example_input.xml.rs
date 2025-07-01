@@ -9,46 +9,53 @@ enum Result {
     NotApplicable,
 }
 
-fn evaluate_target_Allow_Manager_Access(inp: &Inputs) -> bool {
+fn evaluate_target_SamplePolicy_Allow_Manager_Access(inp: &Inputs) -> bool {
     (("Manager" == inp.role)
         && (Regex::new(r"^192\.168\.1\.[0-9]+$")
             .unwrap()
             .is_match(&inp.ipAddress)))
 }
 
-fn evaluate_rule_Allow_Manager_Access(inp: &Inputs) -> Result {
-    if !evaluate_target_Allow_Manager_Access(inp) {
+fn evaluate_rule_SamplePolicy_Allow_Manager_Access(inp: &Inputs) -> Result {
+    if !evaluate_target_SamplePolicy_Allow_Manager_Access(inp) {
         return Result::NotApplicable;
     }
 
     return Result::Permit;
 }
 
-fn evaluate_rule_Deny_All_Others(inp: &Inputs) -> Result {
+fn evaluate_rule_SamplePolicy_Deny_All_Others(inp: &Inputs) -> Result {
     return Result::Deny;
 }
 
-fn evaluate_target_SamplePolicy(inp: &Inputs) -> bool {
-    None
-}
-
-fn evaluate_policy_SamplePolicy(inp: &Inputs) -> bool {
+fn evaluate_policy_SamplePolicy(inp: &Inputs) -> Result {
     let results = vec![
-        evaluate_rule_Allow_Manager_Access(inp),
-        evaluate_rule_Deny_All_Others(inp),
+        evaluate_rule_SamplePolicy_Allow_Manager_Access(inp),
+        evaluate_rule_SamplePolicy_Deny_All_Others(inp),
     ];
 
     //permit-overrides || deny-unless-permit
+    let mut atleast_one_deny = false;
     for res in &results {
         if *res == Result::Permit {
-            return true;
+            return Result::Permit;
+        } else if *res == Result::Deny {
+            atleast_one_deny = true;
         }
     }
-    return false;
+    if atleast_one_deny {
+        return Result::Deny;
+    }
+    return Result::NotApplicable;
 }
 
 fn main() {
     let inp: Inputs = env::read();
-    let decision = evaluate_policy_SamplePolicy(&inp);
+
+    let decision = match evaluate_policy_policy(&inp) {
+        Result::Permit => true,
+        _ => false,
+    };
+
     env::commit(&decision);
 }

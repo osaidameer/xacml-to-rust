@@ -9,7 +9,7 @@ enum Result {
     NotApplicable,
 }
 
-fn evaluate_cond_rule(inp: &Inputs) -> bool {
+fn evaluate_cond_policy_rule(inp: &Inputs) -> bool {
     (Regex::new(r"J.* Hibbert")
         .unwrap()
         .is_match(&inp.subject_id))
@@ -18,34 +18,39 @@ fn evaluate_cond_rule(inp: &Inputs) -> bool {
             .is_match(&inp.subject_id))
 }
 
-fn evaluate_rule_rule(inp: &Inputs) -> Result {
-    if evaluate_cond_rule(inp) {
+fn evaluate_rule_policy_rule(inp: &Inputs) -> Result {
+    if evaluate_cond_policy_rule(inp) {
         return Result::Permit;
     } else {
         return Result::NotApplicable;
     }
 }
 
-fn evaluate_target_policy(inp: &Inputs) -> bool {
-    None
-}
+fn evaluate_policy_policy(inp: &Inputs) -> Result {
+    let results = vec![evaluate_rule_policy_rule(inp)];
 
-fn evaluate_policy_policy(inp: &Inputs) -> bool {
-    let results = vec![evaluate_rule_rule(inp)];
-
-    let atleast_one_permit = false;
+    //deny-overrides
+    let mut atleast_one_permit = false;
     for res in &results {
         if *res == Result::Deny {
-            return false;
+            return Result::Deny;
         } else if *res == Result::Permit {
             atleast_one_permit = true;
         }
     }
-    return atleast_one_permit;
+    if atleast_one_permit {
+        return Result::Permit;
+    }
+    return Result::NotApplicable;
 }
 
 fn main() {
     let inp: Inputs = env::read();
-    let decision = evaluate_policy_policy(&inp);
+
+    let decision = match evaluate_policy_policy(&inp) {
+        Result::Permit => true,
+        _ => false,
+    };
+
     env::commit(&decision);
 }

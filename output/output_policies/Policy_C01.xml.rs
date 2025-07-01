@@ -9,18 +9,16 @@ enum Result {
     NotApplicable,
 }
 
-fn evaluate_target_policy_rule(inp: &Inputs) -> bool {
-    (("Julius Hibbert" == inp.subject_id)
-        && ("http://medico.com/record/patient/BartSimpson" == inp.resource_id)
-        && (("read" == inp.action_id) || ("write" == inp.action_id)))
+fn evaluate_cond_policy_rule(inp: &Inputs) -> bool {
+    (inp.age - inp.bart_simpson_age) >= 5
 }
 
 fn evaluate_rule_policy_rule(inp: &Inputs) -> Result {
-    if !evaluate_target_policy_rule(inp) {
+    if evaluate_cond_policy_rule(inp) {
+        return Result::Permit;
+    } else {
         return Result::NotApplicable;
     }
-
-    return Result::Permit;
 }
 
 fn evaluate_policy_policy(inp: &Inputs) -> Result {
