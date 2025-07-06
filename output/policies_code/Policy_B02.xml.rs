@@ -2,7 +2,7 @@ use policy_core::Inputs;
 use regex::Regex;
 use risc0_zkvm::guest::env;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum Result {
     Permit,
     Deny,

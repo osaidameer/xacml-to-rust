@@ -2,7 +2,7 @@ use policy_core::Inputs;
 use regex::Regex;
 use risc0_zkvm::guest::env;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum Result {
     Permit,
     Deny,
@@ -10,7 +10,12 @@ enum Result {
 }
 
 fn evaluate_cond_policy_rule(inp: &Inputs) -> bool {
-    (inp.age - inp.bart_simpson_age) >= 5
+    (Regex::new(r"J.* Hibbert")
+        .unwrap()
+        .is_match(&inp.subject_id))
+        || (Regex::new(r"B.* Simpson")
+            .unwrap()
+            .is_match(&inp.subject_id))
 }
 
 fn evaluate_rule_policy_rule(inp: &Inputs) -> Result {
