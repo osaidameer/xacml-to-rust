@@ -1,5 +1,4 @@
 use policy_core::Inputs;
-use regex::Regex;
 use risc0_zkvm::guest::env;
 
 #[derive(Debug, PartialEq)]
@@ -10,7 +9,7 @@ enum Result {
 }
 
 fn evaluate_target_policy1_rule1(inp: &Inputs) -> bool {
-    ("J. Hibbert" == inp.subject_id)
+    "J. Hibbert" == inp.subject_id
 }
 
 fn evaluate_rule_policy1_rule1(inp: &Inputs) -> Result {
@@ -46,7 +45,7 @@ fn evaluate_rule_policy3_rule3(inp: &Inputs) -> Result {
 }
 
 fn evaluate_target_policy4_rule4(inp: &Inputs) -> bool {
-    ("Julius Hibbert" == inp.subject_id)
+    "Julius Hibbert" == inp.subject_id
 }
 
 fn evaluate_rule_policy4_rule4(inp: &Inputs) -> Result {

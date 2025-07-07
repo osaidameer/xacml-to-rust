@@ -1,5 +1,4 @@
 use policy_core::Inputs;
-use regex::Regex;
 use risc0_zkvm::guest::env;
 
 #[derive(Debug, PartialEq)]
@@ -10,7 +9,7 @@ enum Result {
 }
 
 fn evaluate_target_policy_rule(inp: &Inputs) -> bool {
-    (("read" == inp.action_id) || ("write" == inp.action_id))
+    "read" == inp.action_id || "write" == inp.action_id
 }
 
 fn evaluate_rule_policy_rule(inp: &Inputs) -> Result {

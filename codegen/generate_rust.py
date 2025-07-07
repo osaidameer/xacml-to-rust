@@ -3,6 +3,8 @@ import subprocess
 import os
 import re
 
+USES_REGEX = False
+
 # Load external templates
 def load_template(filename):
     with open(os.path.join("templates", filename), "r") as file:
@@ -16,15 +18,17 @@ master_template = load_template("master_template.jinja")
 
 
 def rust_expr(node):
+    global USES_REGEX
     if node is None:
         return None
     if node["op"] == "regex":
+        USES_REGEX = True
         pattern = rust_operand(node["left"])
         string_to_match = rust_operand(node["right"])
         return f'Regex::new(r{pattern}).unwrap().is_match(&{string_to_match})'
     if node["op"] in {"AND", "OR"}:
         joiner = " && " if node["op"] == "AND" else " || "
-        return f"({joiner.join(rust_expr(child) for child in node['children'])})"
+        return f"{joiner.join(rust_expr(child) for child in node['children'])}"
     else:
         left = rust_operand(node["left"])
         right = rust_operand(node["right"])
@@ -76,18 +80,19 @@ def render_policy(policy):
 
 
 def generate_policy_code(ir, output_path: str):
+    global USES_REGEX
     rule_functions = []
     policy_functions = []
-    policyset_fn = ""
     policy_ids = []
 
     if ir["type"] == "Policy":
         policy_id, rule_functions, policy_fn = render_policy(ir)
         rendered_master = master_template.render(
+            regex=USES_REGEX,
             rule_functions=rule_functions,
             policy_functions=[policy_fn],
-            policy_name=policy_id,
             policyset_function="",
+            policy_name=policy_id,
             policyset_name=""
         )
     elif ir["type"] == "PolicySet":
@@ -106,12 +111,12 @@ def generate_policy_code(ir, output_path: str):
         )
 
         rendered_master = master_template.render(
+            regex=USES_REGEX,
             rule_functions=rule_functions,
             policy_functions=policy_functions,
             policyset_function=policyset_fn,
             policy_name="",
-            policyset_name=policyset_name,
-            algorithm=ir["algorithm"]
+            policyset_name=policyset_name
         )
 
     else:

@@ -1,5 +1,7 @@
 use policy_core::Inputs;
+{%- if regex %}
 use regex::Regex;
+{%- endif %}
 use risc0_zkvm::guest::env;
 
 #[derive(Debug, PartialEq)]
