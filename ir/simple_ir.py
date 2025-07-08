@@ -21,7 +21,13 @@ comparisons = {
     "or": "||",
     "and": "&&",
     "not": "!",
-    "mod": "%"
+    "mod": "%",
+    "normalize-space": "space",
+    "normalize-to-lower-case": "lower",
+    "substring": "substring",
+    "starts-with": "startswith",
+    "ends-with": "endswith",
+    "contains": "contains",
 }
 
 IR = Dict[str, Union[str, List[Dict], Dict, None]]
@@ -226,7 +232,7 @@ def parse_apply(apply_elem, ns) -> Dict:
 
     """
     Checking for complete matches as operations like "equal" "or" "and" are also part of other functions, can't use "in"
-    thus returning early through exact match if found
+    thus returning early through exact match if found.
     """
     simplified_function_id = simplify_urn(function_id)
     if comparisons.get(simplified_function_id, None) is not None:
@@ -239,12 +245,26 @@ def parse_apply(apply_elem, ns) -> Dict:
     for op_name, op_symbol in comparisons.items():
         #print(function_id)
         if function_id.endswith(f"{op_name}"):
-            return {
-                "op": op_symbol,
-                "left": parse_operand(children[0], ns),
-                "right": parse_operand(children[1], ns)
-            }
-
+            if len(children) == 1:
+                return {
+                    "op": op_symbol,
+                    "operand": parse_operand(children[0], ns)
+                }
+            elif len(children) == 2:
+                return {
+                    "op": op_symbol,
+                    "left": parse_operand(children[0], ns),
+                    "right": parse_operand(children[1], ns)
+                }
+            elif len(children) == 3:
+                return {
+                    "op": op_symbol,
+                    "first": parse_operand(children[0], ns),
+                    "second": parse_operand(children[1], ns),
+                    "third": parse_operand(children[2], ns)
+                }
+            else:
+                raise ValueError(f"Unsupported child count in Apply: {function_id}")
     # Catch error for unsupported functions
     raise ValueError(f"Unsupported XACML function (and not one-and-only): {function_id}")
 
@@ -257,7 +277,7 @@ def parse_operand(elem, ns) -> Optional[Dict]:
 
     if tag == "Apply":
         return parse_apply(elem, ns)
-    # used to distinguish between literals and attributes to be picked from request. Currently NO support for AttributeSelector
+    # used to distinguish between literals and attributes to be picked from request. Currently, NO support for AttributeSelector
     # as AttributeSelector uses xpath
     elif tag == "AttributeValue":
         return {
@@ -277,8 +297,6 @@ def parse_operand(elem, ns) -> Optional[Dict]:
 
 
 if __name__ == "__main__":
-    ir = parse_xacml_simple("../policies/Policy_D13.xml")
-
+    ir = parse_xacml_simple("../policies/Policy_C330.xml")
     print(json.dumps(ir, indent=2))
-
     print("IR generated successfully!")

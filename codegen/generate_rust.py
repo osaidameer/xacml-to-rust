@@ -26,6 +26,29 @@ def rust_expr(node):
         pattern = rust_operand(node["left"])
         string_to_match = rust_operand(node["right"])
         return f'Regex::new(r{pattern}).unwrap().is_match(&{string_to_match})'
+    if node["op"] == "space":
+        attribute = rust_operand(node["operand"])
+        return f"({attribute}.trim().to_string())"
+    if node["op"] == "lower":
+        attribute = rust_operand(node["operand"])
+        return f"({attribute}.to_lowercase().to_string())"
+    if node["op"] == "startswith":
+        left = rust_operand(node["left"])
+        right = rust_operand(node["right"])
+        return f"({right}.starts_with({left}))"
+    if node["op"] == "endswith":
+        left = rust_operand(node["left"])
+        right = rust_operand(node["right"])
+        return f"({right}.ends_with({left}))"
+    if node["op"] == "contains":
+        left = rust_operand(node["left"])
+        right = rust_operand(node["right"])
+        return f"({right}.contains({left}))"
+    if node["op"] == "substring":
+        first = rust_operand(node["first"])
+        second = rust_operand(node["second"])
+        third = rust_operand(node["third"])
+        return f"substring_helper({"&" if "inp" in first else ""}{first}, {second}, {third}).unwrap_or(\"\")"
     if node["op"] in {"AND", "OR"}:
         joiner = " && " if node["op"] == "AND" else " || "
         return f"({joiner.join(rust_expr(child) for child in node['children'])})"
@@ -50,10 +73,15 @@ def rust_operand(op):
 
 def render_rule(rule, policy_id):
     rule_id = rule["rule_id"].replace("-","_")
+    cond_expr = rust_expr(rule["condition"])
+    helper = False
+    if "substring" in cond_expr:
+        helper = True
     return rule_id, rule_template.render(
         policy_name=policy_id,
         target_expr=rust_expr(rule["target"]),
-        cond_expr=rust_expr(rule["condition"]),
+        cond_expr=cond_expr,
+        substring_helper=helper,
         rule_name=rule_id,
         effect=rule["effect"]
     )
