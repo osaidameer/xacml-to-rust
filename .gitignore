@@ -1,0 +1,16 @@
+# .gitignore
+batch_process.py
+log.txt
+failed.txt
+output/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+env/
+*.egg-info/
+
+# VSCode or PyCharm
+.idea/
+.vscode/

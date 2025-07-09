@@ -12,6 +12,7 @@ fn evaluate_policyset_{{ policyset_name }}(inp: &Inputs) -> bool {
     {% if target_expr %}
     if !evaluate_target_{{ policyset_name }}(inp) {
         return false;
+    }
     {% endif %}
 
     let results = vec![
