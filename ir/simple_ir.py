@@ -3,7 +3,7 @@ from typing import Dict, List, Union, Optional
 import json
 
 """
-Standard comparison and arithmetic functions. Currently missing duration, bag, set, string manipulation, and type 
+Standard comparison and arithmetic functions. Currently missing duration, bag, set, and type 
 conversion functions
 """
 comparisons = {
@@ -28,6 +28,9 @@ comparisons = {
     "starts-with": "startswith",
     "ends-with": "endswith",
     "contains": "contains",
+    "round": "round",
+    "abs": "abs",
+    "floor": "floor"
 }
 
 IR = Dict[str, Union[str, List[Dict], Dict, None]]
@@ -231,11 +234,16 @@ def parse_apply(apply_elem, ns) -> Dict:
         return parse_operand(children[0], ns)
 
     """
-    Checking for complete matches as operations like "equal" "or" "and" are also part of other functions, can't use "in"
-    thus returning early through exact match if found.
+    Checking for complete matches as operations like "equal" "or" "and" are also part of other function names, can't use 
+    "in" thus returning early through exact match if found.
     """
     simplified_function_id = simplify_urn(function_id)
     if comparisons.get(simplified_function_id, None) is not None:
+        if simplified_function_id in ["floor", "round"]:
+            return {
+                "op": comparisons[simplified_function_id],
+                "operand": parse_operand(children[0], ns)
+            }
         return {
             "op": comparisons[simplified_function_id],
             "left": parse_operand(children[0], ns),
@@ -297,6 +305,6 @@ def parse_operand(elem, ns) -> Optional[Dict]:
 
 
 if __name__ == "__main__":
-    ir = parse_xacml_simple("../policies/Policy_C330.xml")
+    ir = parse_xacml_simple("../policies/Policy_IIC024.xml")
     print(json.dumps(ir, indent=2))
     print("IR generated successfully!")

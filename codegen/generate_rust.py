@@ -42,6 +42,10 @@ def handle_boolean(node):
     joiner = " && " if node["op"] == "AND" else " || "
     return f"({joiner.join(rust_expr(child) for child in node['children'])})"
 
+def handle_arithmetic(node, method):
+    attribute = rust_operand(node["operand"])
+    return f"({attribute}.{method}())"
+
 def handle_default(node):
     left = rust_operand(node["left"])
     right = rust_operand(node["right"])
@@ -56,6 +60,7 @@ helper_functions = {
     "substring": (handle_substring, None),
     "AND": (handle_boolean, None),
     "OR": (handle_boolean, None),
+    "abs": (handle_arithmetic, "abs"), "floor": (handle_arithmetic, "floor"), "round": (handle_arithmetic, "round"),
 }
 
 def rust_expr(node):

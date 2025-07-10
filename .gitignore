@@ -3,6 +3,7 @@ batch_process.py
 log.txt
 failed.txt
 output/
+policies/
 
 # Python
 __pycache__/
