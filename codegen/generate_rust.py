@@ -72,7 +72,7 @@ def rust_operand(op):
     if op["type"] == "attribute":
         return f"inp.{re.sub(r'[^a-zA-Z0-9_]', '_', op['id'])}"
     elif op["type"] == "value":
-        if op["data_type"] in {"string", "anyURI", "date", "time", "dateTime"}:
+        if op["data_type"] in {"string", "anyURI", "date", "time", "dateTime", "rfc822Name"}:
             return f'"{op["value"]}"'
         return str(op["value"])
     else:

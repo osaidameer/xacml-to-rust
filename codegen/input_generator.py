@@ -11,7 +11,10 @@ def rust_type(xsd_type):
         "integer": "i32",
         "boolean": "bool",
         "double": "f64",
-        "anyURI": "String"
+        "anyURI": "String",
+        "date": "String",
+        "dateTime": "String",
+        "time": "String"
     }
     return mapping.get(xsd_type.split('#')[-1].lower(), "String")
 
