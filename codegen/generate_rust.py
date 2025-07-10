@@ -46,6 +46,11 @@ def handle_arithmetic(node, method):
     attribute = rust_operand(node["operand"])
     return f"({attribute}.{method}())"
 
+def handle_conversion(node, method):
+    attribute = rust_operand(node["operand"])
+    return f"({attribute} {method})"
+
+
 def handle_default(node):
     left = rust_operand(node["left"])
     right = rust_operand(node["right"])
@@ -61,6 +66,7 @@ helper_functions = {
     "AND": (handle_boolean, None),
     "OR": (handle_boolean, None),
     "abs": (handle_arithmetic, "abs"), "floor": (handle_arithmetic, "floor"), "round": (handle_arithmetic, "round"),
+    "integer": (handle_conversion, "as i32"), "double": (handle_conversion, "as f64"),
 }
 
 def rust_expr(node):

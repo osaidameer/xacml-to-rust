@@ -30,7 +30,9 @@ comparisons = {
     "contains": "contains",
     "round": "round",
     "abs": "abs",
-    "floor": "floor"
+    "floor": "floor",
+    "integer-to-double": "double",
+    "double-to-integer": "integer",
 }
 
 IR = Dict[str, Union[str, List[Dict], Dict, None]]
@@ -239,7 +241,7 @@ def parse_apply(apply_elem, ns) -> Dict:
     """
     simplified_function_id = simplify_urn(function_id)
     if comparisons.get(simplified_function_id, None) is not None:
-        if simplified_function_id in ["floor", "round"]:
+        if simplified_function_id in ["floor", "round", "integer-to-double", "double-to-integer"]:
             return {
                 "op": comparisons[simplified_function_id],
                 "operand": parse_operand(children[0], ns)
