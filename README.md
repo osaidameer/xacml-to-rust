@@ -66,4 +66,5 @@ This module takes the intermediate representation (IR) as input and generates Ru
 - Design testing pipeline to run all test cases from collected dataset
   - Define input format from request.xml in dataset
 - Handle case where attribute is not present in request, based on decided input format
+- Add string manipulation functionality. Clean up rust_expr function and merge after completion
 
