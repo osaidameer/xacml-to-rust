@@ -18,6 +18,9 @@ def rust_type(xsd_type):
     }
     return mapping.get(xsd_type.split('#')[-1].lower(), "String")
 
+def rustify_name(data):
+    return re.sub(r'[^a-zA-Z0-9_]', '_', data.split(":")[-1])
+
 def extract_inputs_from_policy(xml_file):
     tree = ET.parse(xml_file)
     root = tree.getroot()
@@ -30,9 +33,10 @@ def extract_inputs_from_policy(xml_file):
         tag = strip_tag(elem.tag)
         if tag == "AttributeDesignator":
             attr_id = elem.attrib.get("AttributeId", "").strip()
+            attr_cat = elem.attrib.get("Category", "").strip()
             data_type = elem.attrib.get("DataType", "").strip()
             if attr_id and data_type:
-                name = re.sub(r'[^a-zA-Z0-9_]', '_', attr_id.split(":")[-1])
+                name = rustify_name(attr_cat) + "_" + rustify_name(attr_id)
                 inputs[name] = data_type
 
     return [{"name": name, "data_type": dtype} for name, dtype in inputs.items()]
@@ -50,7 +54,8 @@ def generate_rust_struct(attributes):
     )
 
     return f"""\
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[serde(default)]
 pub struct Inputs {{
 {fields}
 }}

@@ -11,7 +11,7 @@ fn evaluate_target_{{ policy_name }}(inp: &Inputs) -> bool {
 fn evaluate_policy_{{ policy_name }}(inp: &Inputs) -> Result {
     {% if target_expr %}
     if !evaluate_target_{{ policy_name }}(inp) {
-        return false;
+        return Result::NotApplicable;
     }
     {% endif %}
 
@@ -66,8 +66,10 @@ fn evaluate_policy_{{ policy_name }}(inp: &Inputs) -> Result {
     {% if algorithm == "first-applicable" %}
     //first-applicable
     for res in &results {
-        if *res != Result::NotApplicable {
-            return *res;
+        if *res == Result::Permit {
+            return Result::Permit;
+        } else if *res == Result::Deny {
+            return Result::Deny;
         }
     }
     return Result::NotApplicable;

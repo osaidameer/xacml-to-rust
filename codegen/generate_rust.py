@@ -1,4 +1,5 @@
 from jinja2 import Template
+from codegen.input_generator import rustify_name
 import subprocess
 import os
 import re
@@ -81,7 +82,7 @@ def rust_operand(op):
     if "op" in op and "type" not in op:
         return f"({rust_expr(op)})"
     if op["type"] == "attribute":
-        return f"inp.{re.sub(r'[^a-zA-Z0-9_]', '_', op['id'])}"
+        return f"inp.{rustify_name(op["category"]) + "_" + rustify_name(op["id"])}"
     elif op["type"] == "value":
         if op["data_type"] in {"string", "anyURI", "date", "time", "dateTime", "rfc822Name"}:
             return f'"{op["value"]}"'
