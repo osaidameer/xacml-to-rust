@@ -51,10 +51,15 @@ def handle_conversion(node, method):
     attribute = rust_operand(node["operand"])
     return f"({attribute} {method})"
 
-
 def handle_default(node):
     left = rust_operand(node["left"])
     right = rust_operand(node["right"])
+    if node["op"] in ("<", "<=", ">", ">=") and right.startswith('"'):
+        left = left + ".as_str()"
+    if right == "INF":
+        right = "f64::INFINITY"
+    elif right == "-INF":
+        right = "f64::NEG_INFINITY"
     return f"{left} {node['op']} {right}"
 
 helper_functions = {

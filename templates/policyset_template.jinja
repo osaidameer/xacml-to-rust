@@ -68,4 +68,22 @@ fn evaluate_policyset_{{ policyset_name }}(inp: &Inputs) -> bool {
     return false;
     {% endif %}
 
+    {% if algorithm == "only-one-applicable" %}
+    //only-one-applicable
+    let mut counter = 0;
+    for res in &results {
+        if *res == Result::Deny || *res == Result::Permit {
+            counter += 1;
+            if counter > 1 {
+                return false;
+            }
+        }
+        //continues in the case of NotApplicable, condition not needed, adding comment for clarity
+    }
+    if counter == 1 {
+        return true;
+    }
+    return false;
+    {% endif %}
+
 }

@@ -4,7 +4,7 @@ fn substring_helper(input: &str, start: i32, end: i32) -> Option<&str> {
         return None;
     }
     let start_size = start as usize;
-    let end_size = if length == -1 {
+    let end_size = if end == -1 {
         input.len()
     } else {
         end as usize

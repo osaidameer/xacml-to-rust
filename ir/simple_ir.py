@@ -33,7 +33,11 @@ comparisons = {
     "floor": "floor",
     "integer-to-double": "double",
     "double-to-integer": "integer",
+    "bag": "bag",
+    "bag-size": "bagsize",
+    "is-in": "isin",
 }
+
 
 IR = Dict[str, Union[str, List[Dict], Dict, None]]
 
@@ -233,13 +237,14 @@ def parse_apply(apply_elem, ns) -> Dict:
     if "one-and-only" in function_id:
         if len(children) != 1:
             raise ValueError(f"one-and-only requires exactly 1 argument, got {len(children)}")
-        return parse_operand(children[0], ns)
+        return parse_operand(children[0], ns, is_bag=True)
 
     """
     Checking for complete matches as operations like "equal" "or" "and" are also part of other function names, can't use 
     "in" thus returning early through exact match if found.
     """
     simplified_function_id = simplify_urn(function_id)
+
     if comparisons.get(simplified_function_id, None) is not None:
         if simplified_function_id in ["floor", "round", "integer-to-double", "double-to-integer"]:
             return {
@@ -252,9 +257,15 @@ def parse_apply(apply_elem, ns) -> Dict:
             "right": parse_operand(children[1], ns)
         }
 
+
     for op_name, op_symbol in comparisons.items():
         #print(function_id)
         if function_id.endswith(f"{op_name}"):
+            if op_name in ("bag", "is-in", "bag-size"):
+                return {
+                    "op": op_symbol,
+                    "args": [parse_operand(child, ns) for child in children],
+                }
             if len(children) == 1:
                 return {
                     "op": op_symbol,
@@ -279,7 +290,7 @@ def parse_apply(apply_elem, ns) -> Dict:
     raise ValueError(f"Unsupported XACML function (and not one-and-only): {function_id}")
 
 
-def parse_operand(elem, ns) -> Optional[Dict]:
+def parse_operand(elem, ns, is_bag=False) -> Optional[Dict]:
     if elem is None:
         return None
 
@@ -300,13 +311,14 @@ def parse_operand(elem, ns) -> Optional[Dict]:
             "type": "attribute",
             "id": simplify_urn(elem.get("AttributeId")),
             "data_type": simplify_urn(elem.get("DataType")),
-            "category": simplify_urn(elem.get("Category"))
+            "category": simplify_urn(elem.get("Category")),
+            "is_bag": is_bag,
         }
     else:
         raise ValueError(f"Unsupported operand type: {tag}")
 
 
 if __name__ == "__main__":
-    ir = parse_xacml_simple("../policies/Policy_IIC024.xml")
+    ir = parse_xacml_simple("../policies/Policy_IIC351.xml")
     print(json.dumps(ir, indent=2))
     print("IR generated successfully!")
