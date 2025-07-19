@@ -1,0 +1,6 @@
+{
+    "access_subject_subject_id": "Julius Hibbert",
+    "resource_resource_id": "http://medico.com/record/patient/BartSimpson",
+    "action_action_id": "read",
+    "environment_current_time": "08:23:47-05:00"
+}
