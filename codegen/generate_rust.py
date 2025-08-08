@@ -60,7 +60,33 @@ def handle_default(node):
         right = "f64::INFINITY"
     elif right == "-INF":
         right = "f64::NEG_INFINITY"
+    elif right == "NaN":
+        right = "f64::NaN"
     return f"{left} {node['op']} {right}"
+
+def handle_bag(node):
+    args = node["args"]
+    values = []
+    for item in args:
+        val = rust_operand(item)
+        if val.startswith('"') and val.endswith('"'):
+            values.append("&" + val + ".to_string()")
+        elif val.startswith("inp."):
+            values.append("&" + val)
+        else:
+            values.append("&" + val)
+    return f"vec![{",".join(values)}]"
+
+def handle_bagsize(node):
+    args = node["args"]
+    return f"{rust_operand(args[0])}.len()"
+
+def handle_isin(node):
+    args = node["args"]
+    search_value = rust_operand(args[0])
+    if search_value.startswith('"') and search_value.endswith('"'):
+        search_value = f"{search_value}.to_string()"
+    return f"{rust_operand(args[1])}.contains(&{search_value})"
 
 helper_functions = {
     "regex": (handle_regex, None),
@@ -73,6 +99,9 @@ helper_functions = {
     "OR": (handle_boolean, None),
     "abs": (handle_arithmetic, "abs"), "floor": (handle_arithmetic, "floor"), "round": (handle_arithmetic, "round"),
     "integer": (handle_conversion, "as i32"), "double": (handle_conversion, "as f64"),
+    "bag": (handle_bag, None),
+    "bagsize": (handle_bagsize, None),
+    "isin": (handle_isin, None),
 }
 
 def rust_expr(node):
@@ -89,7 +118,7 @@ def rust_operand(op):
     if op["type"] == "attribute":
         return f"inp.{rustify_name(op["category"]) + "_" + rustify_name(op["id"])}"
     elif op["type"] == "value":
-        if op["data_type"] in {"string", "anyURI", "date", "time", "dateTime", "rfc822Name"}:
+        if op["data_type"] in {"string", "anyURI", "date", "time", "dateTime", "rfc822Name", "dayTimeDuration", "yearMonthDuration", "hexBinary", "base64Binary"}:
             return f'"{op["value"]}"'
         return str(op["value"])
     else:

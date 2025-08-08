@@ -2,6 +2,8 @@
 batch_process.py
 log.txt
 failed.txt
+ir/all_ir.json
+misc.py
 output/
 policies/
 

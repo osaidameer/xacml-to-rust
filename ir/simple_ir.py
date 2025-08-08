@@ -33,9 +33,9 @@ comparisons = {
     "floor": "floor",
     "integer-to-double": "double",
     "double-to-integer": "integer",
-    "bag": "bag",
-    "bag-size": "bagsize",
-    "is-in": "isin",
+    "bag": "bag", # SHALL take any number of arguments of ‘type’ and return a bag of ‘type’ values
+    "bag-size": "bagsize", # SHALL take a bag of ‘type’ values as an argument and return size
+    "is-in": "isin", # SHALL take argument of type as first argument, bag of values as the second argument
 }
 
 
@@ -232,12 +232,13 @@ def parse_apply(apply_elem, ns) -> Dict:
     """Recursively parse Apply/Condition logic"""
     function_id = apply_elem.get("FunctionId")
     children = list(apply_elem)
+    children = [child for child in children if child.tag is not None and not callable(child.tag)]
 
     # Skipping one-and-only functions for simplicity right now, no bag implementation yet (just pass through the first child)
     if "one-and-only" in function_id:
         if len(children) != 1:
             raise ValueError(f"one-and-only requires exactly 1 argument, got {len(children)}")
-        return parse_operand(children[0], ns, is_bag=True)
+        return parse_operand(children[0], ns)
 
     """
     Checking for complete matches as operations like "equal" "or" "and" are also part of other function names, can't use 
@@ -290,7 +291,7 @@ def parse_apply(apply_elem, ns) -> Dict:
     raise ValueError(f"Unsupported XACML function (and not one-and-only): {function_id}")
 
 
-def parse_operand(elem, ns, is_bag=False) -> Optional[Dict]:
+def parse_operand(elem, ns) -> Optional[Dict]:
     if elem is None:
         return None
 
@@ -312,13 +313,45 @@ def parse_operand(elem, ns, is_bag=False) -> Optional[Dict]:
             "id": simplify_urn(elem.get("AttributeId")),
             "data_type": simplify_urn(elem.get("DataType")),
             "category": simplify_urn(elem.get("Category")),
-            "is_bag": is_bag,
         }
     else:
         raise ValueError(f"Unsupported operand type: {tag}")
 
 
 if __name__ == "__main__":
+    """
     ir = parse_xacml_simple("../policies/Policy_IIC351.xml")
     print(json.dumps(ir, indent=2))
     print("IR generated successfully!")
+    """
+
+    import os
+    base_dir = r"C:\Users\Osaid\Desktop\ZKZT\core-develop\pdp-testutils\src\test\resources\conformance\xacml-3.0-from-2.0-ct\mandatory"
+
+    # Output file to store all IRs
+    output_file = "all_ir.json"
+    all_irs = {}
+
+    # Loop through IIC120 to IIC163
+    for i in range(120, 164):
+        key = f"IIC{i}"
+        folder = os.path.join(base_dir, key)
+        filename = f"Policy_{key}.xml"
+        file_path = os.path.join(folder, filename)
+
+        if os.path.exists(file_path):
+            print(f"Processing {key}...")
+            try:
+                ir = parse_xacml_simple(file_path)
+                print(json.dumps(ir, indent=2))
+                all_irs[key] = ir
+            except Exception as e:
+                print(f"❌ Failed to parse {key}: {e}")
+        else:
+            print(f"⚠️ File not found: {file_path}")
+
+    # Write everything to one JSON file
+    with open(output_file, "w", encoding="utf-8") as f:
+        json.dump(all_irs, f, indent=2)
+
+    print(f"\n✅ All IRs written to {output_file}")
