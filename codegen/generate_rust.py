@@ -98,7 +98,7 @@ def handle_set_boolean(node, method):
     if method != "equal":
         left_iter = "iter()" if left.startswith("inp.") else "into_iter()"
         right_iter = "iter()" if right.startswith("inp.") else "into_iter()"
-        return f"{"!" if method == "member" else ""}{left}.{left_iter}.collect::<HashSet<_>>().{method}(&{right}.{right_iter}.collect::<HashSet<_>>())"
+        return f"{left}.{left_iter}.collect::<HashSet<_>>().{method}(&{right}.{right_iter}.collect::<HashSet<_>>()){" == false" if method == "is_disjoint" else ""}"
     return f"{left}.into_iter().collect::<HashSet<_>>() == {right}.into_iter().collect::<HashSet<_>>()"
 
 
