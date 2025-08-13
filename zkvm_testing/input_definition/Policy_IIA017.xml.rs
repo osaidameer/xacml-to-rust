@@ -1,11 +1,11 @@
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 #[serde(default)]
 pub struct Inputs {
-    pub environment_current_time: String,
+    pub environment_current_time: Vec<String>,
 }
 
 impl Inputs {
-    pub fn new(environment_current_time: String) -> Self {
+    pub fn new(environment_current_time: Vec<String>) -> Self {
         Self {
             environment_current_time,
         }
