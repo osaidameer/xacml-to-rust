@@ -5,6 +5,7 @@ import os
 import re
 
 USES_REGEX = False
+USES_SET = False
 
 # Load external templates
 def load_template(filename):
@@ -61,7 +62,7 @@ def handle_default(node):
     elif right == "-INF":
         right = "f64::NEG_INFINITY"
     elif right == "NaN":
-        right = "f64::NaN"
+        right = "f64::NAN"
     return f"{left} {node['op']} {right}"
 
 def handle_bag(node):
@@ -88,6 +89,29 @@ def handle_isin(node):
         search_value = f"{search_value}.to_string()"
     return f"{rust_operand(args[1])}.contains(&{search_value})"
 
+def handle_set_boolean(node, method):
+    global USES_SET
+    USES_SET = True
+    left = rust_operand(node["left"])
+    right = rust_operand(node["right"])
+
+    if method != "equal":
+        left_iter = "iter()" if left.startswith("inp.") else "into_iter()"
+        right_iter = "iter()" if right.startswith("inp.") else "into_iter()"
+        return f"{"!" if method == "member" else ""}{left}.{left_iter}.collect::<HashSet<_>>().{method}(&{right}.{right_iter}.collect::<HashSet<_>>())"
+    return f"{left}.into_iter().collect::<HashSet<_>>() == {right}.into_iter().collect::<HashSet<_>>()"
+
+
+def handle_set_non_boolean(node, method):
+    global USES_SET
+    USES_SET = True
+    left = rust_operand(node["left"])
+    right = rust_operand(node["right"])
+    left_iter = "iter()" if left.startswith("inp.") else "into_iter()"
+    right_iter = "iter()" if right.startswith("inp.") else "into_iter()"
+
+    return f"{left}.{left_iter}.collect::<HashSet<_>>().{method}(&{right}.{right_iter}.collect::<HashSet<_>>()).cloned().collect::<Vec<_>>()"
+
 helper_functions = {
     "regex": (handle_regex, None),
     "space": (handle_string_normalization, "trim"), "lower": (handle_string_normalization, "to_lowercase"),
@@ -102,6 +126,8 @@ helper_functions = {
     "bag": (handle_bag, None),
     "bagsize": (handle_bagsize, None),
     "isin": (handle_isin, None),
+    "intersection": (handle_set_non_boolean, "intersection"), "union": (handle_set_non_boolean, "union"),
+    "onememberof": (handle_set_boolean, "is_disjoint"), "subset": (handle_set_boolean, "is_subset"), "setequals": (handle_set_boolean, "equal"),
 }
 
 def rust_expr(node):
@@ -168,6 +194,7 @@ def generate_policy_code(ir, output_path: str):
     if ir["type"] == "Policy":
         policy_id, rule_functions, policy_fn = render_policy(ir)
         rendered_master = master_template.render(
+            set=USES_SET,
             regex=USES_REGEX,
             rule_functions=rule_functions,
             policy_functions=[policy_fn],
@@ -191,6 +218,7 @@ def generate_policy_code(ir, output_path: str):
         )
 
         rendered_master = master_template.render(
+            set=USES_SET,
             regex=USES_REGEX,
             rule_functions=rule_functions,
             policy_functions=policy_functions,

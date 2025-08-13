@@ -36,6 +36,11 @@ comparisons = {
     "bag": "bag", # SHALL take any number of arguments of ‘type’ and return a bag of ‘type’ values
     "bag-size": "bagsize", # SHALL take a bag of ‘type’ values as an argument and return size
     "is-in": "isin", # SHALL take argument of type as first argument, bag of values as the second argument
+    "intersection": "intersection",
+    "at-least-one-member-of": "onememberof",
+    "union": "union",
+    "subset": "subset",
+    "set-equals": "setequals"
 }
 
 

@@ -28,7 +28,7 @@ def rustify_name(data):
 
 def extract_inputs_from_policy(xml_file):
     tree = ET.parse(xml_file)
-    bag_functions = ["bag", "bag-size", "is-in", "union", "intersection", "subset"]
+    bag_functions = ["bag", "bag-size", "is-in", "union", "intersection", "subset", "set-equals", "at-least-one-member-of"]
     inputs = {}
 
     for elem in tree.xpath("//*[local-name()='AttributeDesignator']"):
@@ -42,7 +42,6 @@ def extract_inputs_from_policy(xml_file):
 
             for ancestor in reversed(elem.xpath("ancestor::*[local-name()='Apply']")):
                 func_id = ancestor.get("FunctionId", "")
-                #print(func_id)
                 if func_id.endswith("bag"):
                     break
                 elif any(vf in func_id for vf in bag_functions):

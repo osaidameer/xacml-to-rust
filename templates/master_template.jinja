@@ -2,6 +2,9 @@ use policy_core::Inputs;
 {%- if regex %}
 use regex::Regex;
 {%- endif %}
+{%- if set %}
+use std::collections::HashSet;
+{%- endif %}
 use risc0_zkvm::guest::env;
 
 #[derive(Debug, PartialEq)]
