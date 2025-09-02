@@ -5,6 +5,12 @@ use regex::Regex;
 {%- if set %}
 use std::collections::HashSet;
 {%- endif %}
+{%- if time or date %}
+use chrono::{NaiveDate, DateTime, FixedOffset};
+{%- endif %}
+{%- if duration %}
+use iso8601_duration::Duration as IsoDuration;
+{%- endif %}
 use risc0_zkvm::guest::env;
 
 #[derive(Debug, PartialEq)]
@@ -13,6 +19,13 @@ enum Result {
     Deny,
     NotApplicable,
 }
+
+{%- if time %}
+fn parse_time(raw: &str) -> DateTime<FixedOffset> {
+    let input = format!("1970-01-01T{}", raw);
+    DateTime::parse_from_rfc3339(&input).unwrap()
+}
+{%- endif %}
 
 {% for rule_fn in rule_functions %}
 {{ rule_fn }}
@@ -30,7 +43,7 @@ fn main() {
     {% if policyset_function %}
     let decision = evaluate_policyset_{{ policyset_name }}(&inp);
     {% else %}
-    let decision = match evaluate_policy_policy(&inp) {
+    let decision = match evaluate_policy_{{ policy_name }}(&inp) {
         Result::Permit => true,
         _ => false,
     };

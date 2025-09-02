@@ -15,11 +15,13 @@ fn evaluate_policyset_{{ policyset_name }}(inp: &Inputs) -> bool {
     }
     {% endif %}
 
+    {% if algorithm != "only-one-applicable" %}
     let results = vec![
         {% for policy_id in policy_ids %}
         evaluate_policy_{{ policy_id }}(inp),
         {% endfor %}
     ];
+    {% endif %}
 
     {% if algorithm == "deny-overrides" or algorithm == "ordered-deny-overrides"%}
     //deny-overrides
@@ -70,9 +72,14 @@ fn evaluate_policyset_{{ policyset_name }}(inp: &Inputs) -> bool {
 
     {% if algorithm == "only-one-applicable" %}
     //only-one-applicable
+    let results = vec![
+        {% for policy_id in policies_with_targets %}
+        evaluate_target_{{ policy_id }}(inp),
+        {% endfor %}
+    ];
     let mut counter = 0;
     for res in &results {
-        if *res == Result::Deny || *res == Result::Permit {
+        if *res == true {
             counter += 1;
             if counter > 1 {
                 return false;

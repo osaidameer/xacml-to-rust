@@ -210,9 +210,9 @@ def parse_rule(rule_elem, ns) -> Dict:
 
     return rule
 
-
+"""
 def parse_attribute(attr_elem, ns) -> Dict:
-    """Parse an Attribute element into IR format."""
+    #Parse an Attribute element into IR format.
     attr_id = attr_elem.get("AttributeId")
     data_type = attr_elem.get("DataType")
     values = [v.text for v in attr_elem.findall(".//xacml:AttributeValue", namespaces=ns)]
@@ -220,9 +220,9 @@ def parse_attribute(attr_elem, ns) -> Dict:
     return {
         "id": simplify_urn(attr_id),
         "data_type": simplify_urn(data_type),
-        "values": values
+        "values": values,
     }
-
+"""
 
 def parse_condition(condition_elem, ns) -> Optional[Dict]:
     """Parse a Condition element into IR format."""
@@ -313,11 +313,22 @@ def parse_operand(elem, ns) -> Optional[Dict]:
             "value": elem.text
         }
     elif tag == "AttributeDesignator":
+        bag_functions = ["bag", "bag-size", "is-in", "union", "intersection", "subset", "set-equals",
+                         "at-least-one-member-of"]
+        is_vector = False
+        for ancestor in reversed(elem.xpath("ancestor::*[local-name()='Apply']")):
+            func_id = ancestor.get("FunctionId", "")
+            if func_id.endswith("bag"):
+                break
+            elif any(vf in func_id for vf in bag_functions):
+                is_vector = True
+                break
         return {
             "type": "attribute",
             "id": simplify_urn(elem.get("AttributeId")),
             "data_type": simplify_urn(elem.get("DataType")),
             "category": simplify_urn(elem.get("Category")),
+            "is_vector": is_vector,
         }
     else:
         raise ValueError(f"Unsupported operand type: {tag}")
@@ -338,7 +349,7 @@ if __name__ == "__main__":
     all_irs = {}
 
     # Loop through IIC120 to IIC163
-    for i in range(120, 164):
+    for i in range(135, 136):
         key = f"IIC{i}"
         folder = os.path.join(base_dir, key)
         filename = f"Policy_{key}.xml"
