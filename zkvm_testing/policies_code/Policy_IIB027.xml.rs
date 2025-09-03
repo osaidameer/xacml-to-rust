@@ -1,3 +1,4 @@
+use chrono::{DateTime, FixedOffset, NaiveDate};
 use policy_core::Inputs;
 use risc0_zkvm::guest::env;
 
@@ -7,10 +8,17 @@ enum Result {
     Deny,
     NotApplicable,
 }
+fn parse_time(raw: &str) -> DateTime<FixedOffset> {
+    let input = format!("1970-01-01T{}", raw);
+    DateTime::parse_from_rfc3339(&input).unwrap()
+}
 
 fn evaluate_target_policy_rule(inp: &Inputs) -> bool {
     (("Julius Hibbert" == inp.access_subject_subject_id
-        && "2002-02-08T08:23:47-05:00" == inp.access_subject_session_start_time)
+        && "2002-02-08T08:23:47-05:00"
+            .parse::<DateTime<FixedOffset>>()
+            .unwrap()
+            == inp.access_subject_session_start_time)
         && ("http://medico.com/record/patient/BartSimpson" == inp.resource_resource_id)
         && (("read" == inp.action_action_id) || ("write" == inp.action_action_id)))
 }

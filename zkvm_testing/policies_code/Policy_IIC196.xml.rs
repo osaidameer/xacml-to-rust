@@ -1,3 +1,4 @@
+use chrono::{DateTime, FixedOffset, NaiveDate};
 use policy_core::Inputs;
 use risc0_zkvm::guest::env;
 use std::collections::HashSet;
@@ -8,12 +9,21 @@ enum Result {
     Deny,
     NotApplicable,
 }
+fn parse_time(raw: &str) -> DateTime<FixedOffset> {
+    let input = format!("1970-01-01T{}", raw);
+    DateTime::parse_from_rfc3339(&input).unwrap()
+}
 
 fn evaluate_cond_policy_rule(inp: &Inputs) -> bool {
-    (((vec![&"12:01:02-02:00".to_string(), &"08:23:47-05:00".to_string()])
+    (((vec![parse_time("12:01:02-02:00"), parse_time("08:23:47-05:00")])
         .into_iter()
         .collect::<HashSet<_>>()
-        .intersection(&inp.access_subject_test_attr.iter().collect::<HashSet<_>>())
+        .intersection(
+            &inp.access_subject_test_attr
+                .iter()
+                .map(|x| parse_time(x))
+                .collect::<HashSet<_>>(),
+        )
         .cloned()
         .collect::<Vec<_>>())
     .len())

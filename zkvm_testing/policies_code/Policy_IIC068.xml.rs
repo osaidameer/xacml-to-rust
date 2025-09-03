@@ -1,3 +1,4 @@
+use chrono::{DateTime, FixedOffset, NaiveDate};
 use policy_core::Inputs;
 use risc0_zkvm::guest::env;
 
@@ -7,9 +8,16 @@ enum Result {
     Deny,
     NotApplicable,
 }
+fn parse_time(raw: &str) -> DateTime<FixedOffset> {
+    let input = format!("1970-01-01T{}", raw);
+    DateTime::parse_from_rfc3339(&input).unwrap()
+}
 
 fn evaluate_cond_policy_rule(inp: &Inputs) -> bool {
-    inp.access_subject_licensed_on.as_str() > "2002-03-22T08:23:47-05:00"
+    inp.access_subject_licensed_on
+        > "2002-03-22T08:23:47-05:00"
+            .parse::<DateTime<FixedOffset>>()
+            .unwrap()
 }
 
 fn evaluate_rule_policy_rule(inp: &Inputs) -> Result {

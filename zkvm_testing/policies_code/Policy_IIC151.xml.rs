@@ -1,3 +1,5 @@
+use chrono::{DateTime, FixedOffset, NaiveDate};
+use iso8601_duration::Duration as IsoDuration;
 use policy_core::Inputs;
 use risc0_zkvm::guest::env;
 
@@ -6,6 +8,22 @@ enum Result {
     Permit,
     Deny,
     NotApplicable,
+}
+fn parse_time(raw: &str) -> DateTime<FixedOffset> {
+    let input = format!("1970-01-01T{}", raw);
+    DateTime::parse_from_rfc3339(&input).unwrap()
+}
+fn parse_duration(raw: &str) -> String {
+    let is_negative = raw.starts_with('-');
+    let trimmed = raw.trim_start_matches('-');
+
+    let parsed = IsoDuration::parse(trimmed).unwrap().to_string();
+
+    if is_negative {
+        format!("-{}", parsed)
+    } else {
+        parsed
+    }
 }
 
 fn evaluate_cond_policy_rule(inp: &Inputs) -> bool {

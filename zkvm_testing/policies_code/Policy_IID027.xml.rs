@@ -145,17 +145,16 @@ fn evaluate_policy_policy4(inp: &Inputs) -> Result {
 }
 
 fn evaluate_policyset_policyset(inp: &Inputs) -> bool {
-    let results = vec![
-        evaluate_policy_policy1(inp),
-        evaluate_policy_policy2(inp),
-        evaluate_policy_policy3(inp),
-        evaluate_policy_policy4(inp),
-    ];
-
     //only-one-applicable
+    let results = vec![
+        evaluate_target_policy1(inp),
+        evaluate_target_policy2(inp),
+        evaluate_target_policy3(inp),
+        evaluate_target_policy4(inp),
+    ];
     let mut counter = 0;
     for res in &results {
-        if *res == Result::Deny || *res == Result::Permit {
+        if *res == true {
             counter += 1;
             if counter > 1 {
                 return false;

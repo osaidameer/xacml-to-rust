@@ -1,3 +1,4 @@
+use iso8601_duration::Duration as IsoDuration;
 use policy_core::Inputs;
 use risc0_zkvm::guest::env;
 use std::collections::HashSet;
@@ -8,12 +9,29 @@ enum Result {
     Deny,
     NotApplicable,
 }
+fn parse_duration(raw: &str) -> String {
+    let is_negative = raw.starts_with('-');
+    let trimmed = raw.trim_start_matches('-');
+
+    let parsed = IsoDuration::parse(trimmed).unwrap().to_string();
+
+    if is_negative {
+        format!("-{}", parsed)
+    } else {
+        parsed
+    }
+}
 
 fn evaluate_cond_policy_rule(inp: &Inputs) -> bool {
-    (((vec![&"P5Y7M".to_string(), &"P1Y".to_string()])
+    (((vec![parse_duration("P5Y7M"), parse_duration("P1Y")])
         .into_iter()
         .collect::<HashSet<_>>()
-        .intersection(&inp.access_subject_test_attr.iter().collect::<HashSet<_>>())
+        .intersection(
+            &inp.access_subject_test_attr
+                .iter()
+                .map(|x| parse_duration(x))
+                .collect::<HashSet<_>>(),
+        )
         .cloned()
         .collect::<Vec<_>>())
     .len())

@@ -1,3 +1,4 @@
+use chrono::{DateTime, FixedOffset, NaiveDate};
 use policy_core::Inputs;
 use risc0_zkvm::guest::env;
 
@@ -9,7 +10,7 @@ enum Result {
 }
 
 fn evaluate_cond_policy_rule(inp: &Inputs) -> bool {
-    inp.access_subject_test_attr.as_str() <= "2002-03-22"
+    inp.access_subject_test_attr <= "2002-03-22".parse::<NaiveDate>().unwrap()
 }
 
 fn evaluate_rule_policy_rule(inp: &Inputs) -> Result {

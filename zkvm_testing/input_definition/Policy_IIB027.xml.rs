@@ -2,13 +2,13 @@
 #[serde(default)]
 pub struct Inputs {
     pub access_subject_subject_id: String,
-    pub access_subject_session_start_time: String,
+    pub access_subject_session_start_time: DateTime<FixedOffset>,
     pub resource_resource_id: String,
     pub action_action_id: String,
 }
 
 impl Inputs {
-    pub fn new(access_subject_subject_id: String, access_subject_session_start_time: String, resource_resource_id: String, action_action_id: String) -> Self {
+    pub fn new(access_subject_subject_id: String, access_subject_session_start_time: DateTime<FixedOffset>, resource_resource_id: String, action_action_id: String) -> Self {
         Self {
             access_subject_subject_id,
             access_subject_session_start_time,

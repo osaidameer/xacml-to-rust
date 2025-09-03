@@ -1,3 +1,4 @@
+use iso8601_duration::Duration as IsoDuration;
 use policy_core::Inputs;
 use risc0_zkvm::guest::env;
 
@@ -7,9 +8,24 @@ enum Result {
     Deny,
     NotApplicable,
 }
+fn parse_duration(raw: &str) -> String {
+    let is_negative = raw.starts_with('-');
+    let trimmed = raw.trim_start_matches('-');
+
+    let parsed = IsoDuration::parse(trimmed).unwrap().to_string();
+
+    if is_negative {
+        format!("-{}", parsed)
+    } else {
+        parsed
+    }
+}
 
 fn evaluate_cond_policy_rule(inp: &Inputs) -> bool {
-    inp.access_subject_test_attr.contains(&"P5Y3M".to_string())
+    inp.access_subject_test_attr
+        .iter()
+        .map(|x| parse_duration(x))
+        .any(|dt| dt == parse_duration("P5Y3M"))
 }
 
 fn evaluate_rule_policy_rule(inp: &Inputs) -> Result {

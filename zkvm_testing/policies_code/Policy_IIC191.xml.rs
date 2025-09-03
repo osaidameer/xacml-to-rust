@@ -1,3 +1,4 @@
+use chrono::{DateTime, FixedOffset, NaiveDate};
 use policy_core::Inputs;
 use risc0_zkvm::guest::env;
 use std::collections::HashSet;
@@ -10,12 +11,15 @@ enum Result {
 }
 
 fn evaluate_cond_policy_rule(inp: &Inputs) -> bool {
-    (((vec![&"2002-04-12".to_string(), &"2002-03-22".to_string()])
-        .into_iter()
-        .collect::<HashSet<_>>()
-        .intersection(&inp.access_subject_test_attr.iter().collect::<HashSet<_>>())
-        .cloned()
-        .collect::<Vec<_>>())
+    (((vec![
+        &"2002-04-12".parse::<NaiveDate>().unwrap(),
+        &"2002-03-22".parse::<NaiveDate>().unwrap(),
+    ])
+    .into_iter()
+    .collect::<HashSet<_>>()
+    .intersection(&inp.access_subject_test_attr.iter().collect::<HashSet<_>>())
+    .cloned()
+    .collect::<Vec<_>>())
     .len())
         == 2
 }
