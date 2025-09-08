@@ -4,6 +4,8 @@ import subprocess
 import os
 import re
 
+right_f64_dict = {"INF": "f64::INFINITY", "-INF": "f64::NEG_INFINITY", "NaN": "f64::NAN"}
+
 # Load external templates
 def load_template(filename):
     with open(os.path.join("templates", filename), "r") as file:
@@ -52,12 +54,8 @@ def handle_default(node):
     right = rust_operand(node["right"])
     if node["op"] in ("<", "<=", ">", ">=") and right.startswith('"') and not right.endswith("unwrap()"):
         left = left + ".as_str()"
-    if right == "INF":
-        right = "f64::INFINITY"
-    elif right == "-INF":
-        right = "f64::NEG_INFINITY"
-    elif right == "NaN":
-        right = "f64::NAN"
+    if right in {"INF", "-INF", "NaN"}:
+        right = right_f64_dict[right]
     return f"{left} {node['op']} {right}"
 
 def handle_bag(node):
@@ -71,6 +69,8 @@ def handle_bag(node):
             values.append("&" + val)
         elif "parse_time" in val:
             values.append(val)
+        elif "parse_duration" in val:
+            values.append(val)
         else:
             values.append("&" + val)
     return f"vec![{",".join(values)}]"
@@ -80,6 +80,8 @@ def handle_bagsize(node):
     expression = rust_operand(args[0])
     if "parse_time(x))" in expression:
         expression = expression.replace(".iter().map(|x| parse_time(x)).collect()", "")
+    elif "parse_duration(x))" in expression:
+        expression = expression.replace(".iter().map(|x| parse_duration(x)).collect()", "")
     return f"{expression}.len()"
 
 def handle_isin(node):
@@ -88,14 +90,11 @@ def handle_isin(node):
     if search_value.startswith('"') and search_value.endswith('"'):
         search_value = f"{search_value}.to_string()"
 
-    if args[1]["data_type"] == "time":
-        contains = rust_operand(args[0])
+    if args[1]["data_type"].lower() in {"time", "daytimeduration", "yearmonthduration"}:
         return rust_operand(args[1]).replace(".collect()", f".any(|dt| dt == {rust_operand(args[0])})")
     return f"{rust_operand(args[1])}.contains(&{search_value})"
 
-def handle_set_boolean(node, method):
-    left = rust_operand(node["left"])
-    right = rust_operand(node["right"])
+def handle_set_helper(left, right):
     left_iter = "iter()." if left.startswith("inp.") else "into_iter()."
     right_iter = "iter()." if right.startswith("inp.") else "into_iter()."
 
@@ -105,25 +104,16 @@ def handle_set_boolean(node, method):
     if "collect" in right:
         right_iter = ""
         right = right.replace(".collect()", "")
+    return left, right, left_iter, right_iter
 
-    if method != "equal":
+def handle_set_boolean(node, method):
+    left, right, left_iter, right_iter = handle_set_helper(rust_operand(node["left"]), rust_operand(node["right"]))
+    if method != "equal": # subset case
         return f"{left}.{left_iter}collect::<HashSet<_>>().{method}(&{right}.{right_iter}collect::<HashSet<_>>()){" == false" if method == "is_disjoint" else ""}"
     return f"{left}.{left_iter}collect::<HashSet<_>>() == {right}.{right_iter}collect::<HashSet<_>>()"
 
-
 def handle_set_non_boolean(node, method):
-    left = rust_operand(node["left"])
-    right = rust_operand(node["right"])
-    left_iter = "iter()." if left.startswith("inp.") else "into_iter()."
-    right_iter = "iter()." if right.startswith("inp.") else "into_iter()."
-
-    if "collect" in left:
-        left_iter = ""
-        left = left.replace(".collect()", "")
-    if "collect" in right:
-        right_iter = ""
-        right = right.replace(".collect()", "")
-
+    left, right, left_iter, right_iter = handle_set_helper(rust_operand(node["left"]), rust_operand(node["right"]))
     return f"{left}.{left_iter}collect::<HashSet<_>>().{method}(&{right}.{right_iter}collect::<HashSet<_>>()).cloned().collect::<Vec<_>>()"
 
 helper_functions = {
@@ -153,14 +143,21 @@ def rust_operand(op):
     data_type_dict = {"date": "NaiveDate", "time": "NaiveTime", "dateTime": "DateTime<FixedOffset>"}
     if "op" in op and "type" not in op:
         return f"({rust_expr(op)})"
+
     if op["type"] == "attribute":
+        field_name = f"inp.{rustify_name(op['category'])}_{rustify_name(op['id'])}"
         if op["data_type"] == "time":
-            field_name = f"inp.{rustify_name(op['category'])}_{rustify_name(op['id'])}"
             if not op["is_vector"]:
                 return f"parse_time(&{field_name})"
             else:
                 return f"{field_name}.iter().map(|x| parse_time(x)).collect()"
-        return f"inp.{rustify_name(op["category"]) + "_" + rustify_name(op["id"])}"
+        elif op["data_type"] in {"yearMonthDuration", "dayTimeDuration"}:
+            if not op["is_vector"]:
+                return f"parse_duration(&{field_name})"
+            else:
+                return f"{field_name}.iter().map(|x| parse_duration(x)).collect()"
+        return f"{field_name}"
+
     elif op["type"] == "value":
         if op["data_type"] in {"string", "anyURI", "rfc822Name", "hexBinary", "base64Binary"}:
             return f'"{op["value"]}"'
@@ -169,8 +166,9 @@ def rust_operand(op):
         elif op["data_type"] == "time":
             return f'parse_time("{op["value"]}")'
         elif op["data_type"] in {"yearMonthDuration", "dayTimeDuration"}:
-            return f'"{op["value"]}".parse::<iso8601_duration::Duration>().unwrap()'
+            return f'parse_duration("{op["value"]}")'
         return str(op["value"])
+
     else:
         raise ValueError(f"Unsupported operand type: {op['type']}")
 
@@ -207,7 +205,6 @@ def render_policy(policy):
     )
 
     return policy_id, rule_functions, policy_fn
-
 
 def generate_policy_code(ir, output_path: str, crates):
     rule_functions = []

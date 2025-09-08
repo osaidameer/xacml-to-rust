@@ -15,7 +15,7 @@ def rust_type(xsd_type, is_vector=False):
         "date": "NaiveDate",
         "datetime": "DateTime<FixedOffset>",
         "time": "String",
-        "datetimeduration": "String",
+        "daytimeduration": "String",
         "yearmonthduration": "String",
         "base64binary": "Vec<u8>"
     }
@@ -117,15 +117,15 @@ def parse_data(xml_file: str):
 def required_crates(xml_file):
     data_types = parse_data(xml_file)
     functions = parse_functions(xml_file)
-    print(data_types)
-    print(functions)
+    #print(data_types)
+    #print(functions)
 
     crates = {
         "regex": any("regexp" in f for f in functions),
         "set": any("subset" in f or "set" in f or "one-member-of" in f or "union" in f or "intersection" in f for f in functions),
         "datetime": any(dt in data_types for dt in ["date", "datetime"]),
         "time": "time" in data_types or any("time" in func for func in functions),
-        "duration": any(dt in data_types for dt in ["datetimeduration", "yearmonthduration"]),
+        "duration": any(dt in data_types for dt in ["daytimeduration", "yearmonthduration"]),
     }
 
     return crates

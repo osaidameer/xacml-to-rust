@@ -3,8 +3,7 @@ from typing import Dict, List, Union, Optional
 import json
 
 """
-Standard comparison and arithmetic functions. Currently missing duration, bag, set, and type 
-conversion functions
+Standard comparison and arithmetic functions. Currently type conversion functions, high-order bag functions
 """
 comparisons = {
     "greater-than-or-equal": ">=",
@@ -304,8 +303,7 @@ def parse_operand(elem, ns) -> Optional[Dict]:
 
     if tag == "Apply":
         return parse_apply(elem, ns)
-    # used to distinguish between literals and attributes to be picked from request. Currently, NO support for AttributeSelector
-    # as AttributeSelector uses xpath
+    # used to distinguish between literals and attributes to be picked from request. Currently, NO support for AttributeSelector as AttributeSelector uses xpath
     elif tag == "AttributeValue":
         return {
             "type": "value",

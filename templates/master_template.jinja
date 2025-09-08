@@ -27,6 +27,21 @@ fn parse_time(raw: &str) -> DateTime<FixedOffset> {
 }
 {%- endif %}
 
+{%- if duration %}
+fn parse_duration(raw: &str) -> String {
+    let is_negative = raw.starts_with('-');
+    let trimmed = raw.trim_start_matches('-');
+
+    let parsed = IsoDuration::parse(trimmed).unwrap().to_string();
+
+    if is_negative {
+        format!("-{}", parsed)
+    } else {
+        parsed
+    }
+}
+{%- endif %}
+
 {% for rule_fn in rule_functions %}
 {{ rule_fn }}
 {% endfor %}
