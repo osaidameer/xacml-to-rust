@@ -1,5 +1,7 @@
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 #[serde(default)]
+use chrono::{NaiveDate, DateTime, FixedOffset};
+
 pub struct Inputs {
     pub access_subject_subject_id: String,
     pub access_subject_session_start_time: DateTime<FixedOffset>,

@@ -1,15 +1,20 @@
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 #[serde(default)]
+{%- if time or date %}
+use chrono::{NaiveDate, DateTime, FixedOffset};
+{%- endif %}
+{%- if duration %}
 use iso8601_duration::Duration as IsoDuration;
+{%- endif %}
 
 pub struct Inputs {
-    pub access_subject_test_attr: String,
+{{ fields }}
 }
 
 impl Inputs {
-    pub fn new(access_subject_test_attr: String) -> Self {
+    pub fn new({{ params }}) -> Self {
         Self {
-            access_subject_test_attr,
+{{ assigns }}
         }
     }
 }

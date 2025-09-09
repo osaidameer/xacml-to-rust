@@ -1,5 +1,6 @@
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 #[serde(default)]
+
 pub struct Inputs {
     pub access_subject_subject_id: String,
     pub access_subject_some_attribute: String,

@@ -1,5 +1,6 @@
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 #[serde(default)]
+
 pub struct Inputs {
     pub access_subject_group: Vec<String>,
 }

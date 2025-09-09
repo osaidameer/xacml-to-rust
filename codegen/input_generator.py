@@ -1,4 +1,5 @@
 from lxml import etree as ET
+from jinja2 import Template
 import os
 import re
 
@@ -64,21 +65,7 @@ def generate_rust_struct(attributes):
         f"            {attr['name']}," for attr in attributes
     )
 
-    return f"""\
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
-#[serde(default)]
-pub struct Inputs {{
-{fields}
-}}
-
-impl Inputs {{
-    pub fn new({params}) -> Self {{
-        Self {{
-{assigns}
-        }}
-    }}
-}}
-"""
+    return fields, params, assigns
 
 def parse_functions(xml_file):
     tree = ET.parse(xml_file)
@@ -133,14 +120,25 @@ def required_crates(xml_file):
 def generate_input_struct(xml_path: str, output_path: str):
     """Generate Rust Inputs struct from an XACML policy file."""
     attributes = extract_inputs_from_policy(xml_path)
-    rust_code = generate_rust_struct(attributes)
     crates = required_crates(xml_path)
-    print(crates)
+    fields, params, assigns = generate_rust_struct(attributes)
+    #print(crates)
+    with open(os.path.join("templates", "input_template.jinja"), "r") as file:
+        input_template = Template(file.read())
 
+
+    input_rendered = input_template.render(
+        time=crates["time"],
+        date=crates["datetime"],
+        duration=crates["duration"],
+        fields=fields,
+        params=params,
+        assigns=assigns
+    )
     #"""
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w") as f:
-        f.write(rust_code)
+        f.write(input_rendered)
 
     print(f"Rust Inputs struct generated in {output_path}")
     return crates
