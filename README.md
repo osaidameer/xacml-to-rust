@@ -57,7 +57,7 @@ This module takes the intermediate representation (IR) as input and generates Ru
    ```
 
 ## Limitations
-- Currently missing date duration, bag, set, string manipulation, and type conversion functions
+- Currently missing date duration, bag, set, string manipulation, and type conversion functions (DONE)
 - Missing rfc800Name, x500path as data types
 - Does not currently support nested PolicySets
 - Limited support for custom XACML functions
