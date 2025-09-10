@@ -1,6 +1,7 @@
+
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 #[serde(default)]
-
 pub struct Inputs {
     pub resource_resource_id: String,
     pub action_action_id: String,

@@ -1,6 +1,7 @@
+
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 #[serde(default)]
-
 pub struct Inputs {
     pub action_action_approved_by: String,
 }

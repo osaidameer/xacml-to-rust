@@ -1,7 +1,8 @@
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
-#[serde(default)]
+
 use chrono::{NaiveDate, DateTime, FixedOffset};
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[serde(default)]
 pub struct Inputs {
     pub environment_current_date: NaiveDate,
 }
