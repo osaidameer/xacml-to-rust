@@ -1,5 +1,3 @@
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
-#[serde(default)]
 {%- if time or date %}
 use chrono::{NaiveDate, DateTime, FixedOffset};
 {%- endif %}
@@ -7,6 +5,8 @@ use chrono::{NaiveDate, DateTime, FixedOffset};
 use iso8601_duration::Duration as IsoDuration;
 {%- endif %}
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[serde(default)]
 pub struct Inputs {
 {{ fields }}
 }
