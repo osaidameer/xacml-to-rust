@@ -3,8 +3,11 @@ from codegen.input_generator import rustify_name
 import subprocess
 import os
 import re
+import compile_regex
+import hashlib
 
 right_f64_dict = {"INF": "f64::INFINITY", "-INF": "f64::NEG_INFINITY", "NaN": "f64::NAN"}
+regex_dict = dict()
 
 # Load external templates
 def load_template(filename):
@@ -17,10 +20,25 @@ policy_template = load_template("policy_template.jinja")
 policyset_template = load_template("policyset_template.jinja")
 master_template = load_template("master_template.jinja")
 
+def registe_regex(pattern):
+    compiled_bytes = compile_regex.create_dfa_bytes(pattern)
+    h = hashlib.md5()
+    h.update(pattern.encode('utf-8'))
+    p_hash = h.hexdigest()
+    reg_name = "RE_" + p_hash
+    global regex_dict
+    if reg_name in regex_dict.keys():
+        assert compiled_bytes == regex_dict[reg_name], "Error: Regist two regular expression with same name"
+    else:
+        regex_dict[reg_name] = compiled_bytes
+    return reg_name
+
 def handle_regex(node):
     pattern = rust_operand(node["left"])
     string_to_match = rust_operand(node["right"])
-    return f'Regex::new(r{pattern}).unwrap().is_match(&{string_to_match})'
+    regex_name = registe_regex(pattern)
+    return f'eval_regex(&{string_to_match}, &{regex_name})'
+    # return f'Regex::new(r{pattern}).unwrap().is_match(&{string_to_match})'
 
 def handle_string_normalization(node, method):
     attribute = rust_operand(node["operand"])
@@ -188,7 +206,7 @@ def render_rule(rule, policy_id):
 
 
 # separated policy rendering function from original function to support PolicySet
-def render_policy(policy):
+def render_policy(policy, output_dir):
     rule_functions = []
     rule_ids = []
     policy_id = re.sub(r'[^a-zA-Z0-9_]', '_', policy['id'])
@@ -203,16 +221,23 @@ def render_policy(policy):
         policy_name=policy_id,
         rule_ids=rule_ids
     )
+    global regex_dict
+    regex_claim = []
+    for k, v in regex_dict.items():
+        regex_claim.append(f'static {k}: &[u8] = include_bytes!("{k}.bin");')
+        with open(os.path.join(output_dir, f'{k}.bin'), 'wb') as f:
+            f.write(v)
+    return policy_id, rule_functions, policy_fn, regex_claim
 
-    return policy_id, rule_functions, policy_fn
-
-def generate_policy_code(ir, output_path: str, crates):
+def generate_policy_code(ir, output_dir: str, output_file: str, crates):
+    output_path = os.path.join(output_dir, output_file)
     rule_functions = []
     policy_functions = []
     policy_ids = []
+    regex_claims = []
 
     if ir["type"] == "Policy":
-        policy_id, rule_functions, policy_fn = render_policy(ir)
+        policy_id, rule_functions, policy_fn, regex_claim = render_policy(ir, output_dir)
         rendered_master = master_template.render(
             set=crates["set"],
             regex=crates["regex"],
@@ -221,6 +246,7 @@ def generate_policy_code(ir, output_path: str, crates):
             duration=crates["duration"],
             rule_functions=rule_functions,
             policy_functions=[policy_fn],
+            regex_claims=regex_claim,
             policyset_function="",
             policy_name=policy_id,
             policyset_name=""
@@ -228,13 +254,14 @@ def generate_policy_code(ir, output_path: str, crates):
     elif ir["type"] == "PolicySet":
         policies_with_targets = []
         for policy in ir["policies"]:
-            policy_id, rule_fns, policy_fn = render_policy(policy)
+            policy_id, rule_fns, policy_fn, regex_claim = render_policy(policy, output_dir)
             if policy["target"]:
                 print(policy["target"], policy_id)
                 policies_with_targets.append(policy_id)
             policy_ids.append(policy_id)
             policy_functions.append(policy_fn)
             rule_functions.extend(rule_fns)
+            regex_claims = regex_claim
 
         #print(policies_with_targets)
         policyset_name = re.sub(r'[^a-zA-Z0-9_]', '_', ir["id"])
@@ -255,6 +282,7 @@ def generate_policy_code(ir, output_path: str, crates):
             rule_functions=rule_functions,
             policy_functions=policy_functions,
             policyset_function=policyset_fn,
+            regex_claims=regex_claims,
             policy_name="",
             policyset_name=policyset_name
         )

@@ -1,7 +1,5 @@
 use policy_core::Inputs;
-{%- if regex %}
-use regex::Regex;
-{%- endif %}
+use risc0_zkvm::guest::env;
 {%- if set %}
 use std::collections::HashSet;
 {%- endif %}
@@ -11,7 +9,27 @@ use chrono::{NaiveDate, DateTime, FixedOffset};
 {%- if duration %}
 use iso8601_duration::Duration as IsoDuration;
 {%- endif %}
-use risc0_zkvm::guest::env;
+{%- if regex %}
+use regex_automata::dfa::{Automaton, dense::DFA};
+use regex_automata::Input;
+
+fn eval_regex(regex_input: &str, regex_exp: &[u8]) -> bool {
+    match DFA::from_bytes(regex_exp) {
+        Ok((dfa, _)) => {
+            let input = Input::new(regex_input);
+            match dfa.try_search_fwd(&input) {
+                Ok(result) => result.is_some(),
+                Err(_) => false,
+            }
+        },
+        Err(_) => false,
+    }
+}
+{%- endif %}
+
+{% for regex_claim in regex_claims %}
+{{ regex_claim }}
+{% endfor %}
 
 #[derive(Debug, PartialEq)]
 enum Result {

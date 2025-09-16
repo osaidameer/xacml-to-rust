@@ -16,3 +16,7 @@ env/
 # VSCode or PyCharm
 .idea/
 .vscode/
+
+# Nixos Dev
+.envrc
+.direnv
