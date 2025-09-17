@@ -1,0 +1,1413 @@
+{
+    "Policy_IIA001.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIA003.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIA006.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIA007.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIA008.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IIA009.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIA011.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIA013.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIA014.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIA015.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIA016_FIXED.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIA017.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IIA018_FIXED.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIA019.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IIA020_FIXED.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIA021.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IIA022_FIXED_NO_CONTENT_NO_XPATH.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIA023_FIXED_NO_CONTENT_NO_XPATH.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IIB001.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB002.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB003.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB004.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB005.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB006.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB007.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB008.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB009.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB010.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB011.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB012.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB013.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB014.xml.rs": "Failed",
+    "Policy_IIB015.xml.rs": "Failed",
+    "Policy_IIB016.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB017.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB018.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB019.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB020.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB021.xml.rs": [
+        "Failed",
+        "false!=true"
+    ],
+    "Policy_IIB022.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB023.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB024.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB025.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB026.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB027.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB028.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB029.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB030.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB031.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB032.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB033.xml.rs": [
+        "Failed",
+        "false!=true"
+    ],
+    "Policy_IIB034.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB035.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB036.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB037.xml.rs": [
+        "Failed",
+        "false!=true"
+    ],
+    "Policy_IIB038.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB039.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB040.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB041.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB042.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB043.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB044.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB045.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB046.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB047.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB048.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB049.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB050.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB051.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB052.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB053.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIB300.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIB301.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC001.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC002.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC003.xml.rs": [
+        "Failed",
+        "Missing response file"
+    ],
+    "Policy_IIC004.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC005.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC006.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC007.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC008.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC009.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC010.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC011.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC012.xml.rs": [
+        "Failed",
+        "Missing response file"
+    ],
+    "Policy_IIC013.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC014.xml.rs": [
+        "Failed",
+        "Missing response file"
+    ],
+    "Policy_IIC015.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC016.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC017.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC018.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC019.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC020.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC021.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC022.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC024.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC025.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC026.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC027.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC028.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC029.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC030.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC031.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC032.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC033.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC034.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC035.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC036.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC037.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC038.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IIC039.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC040.xml.rs": "Failed",
+    "Policy_IIC041.xml.rs": "Failed",
+    "Policy_IIC042.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC043.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC044.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC045.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC046.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC047.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC048.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC049.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC050.xml.rs": "Failed",
+    "Policy_IIC051.xml.rs": "Failed",
+    "Policy_IIC052.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC053.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC056.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC057.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC058.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC059.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC060.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC061.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC062.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC063.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC064.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC065.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC066.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC067.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC068.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC069.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC070.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC071.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC072.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC073.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC074.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC075.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC076.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC077.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC078.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC079.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC080.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC081.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC086.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC087.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC090.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC091.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC100.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC101.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC108.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC109.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC110.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC111.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC112.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC113.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC114.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC115.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC116.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC117.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC118.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC119.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC120.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC121.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC122.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC123.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC124.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC125.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC126.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC127.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC128.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC129.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC130.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC131.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC132.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC133.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC134.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC135.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC136.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC137.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC138.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC139.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC140.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC141.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC142.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC143.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC144.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC145.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC146.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC147.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IIC148.xml.rs": "Failed",
+    "Policy_IIC149.xml.rs": "Failed",
+    "Policy_IIC150.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC151.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC152.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC153.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC154.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC155.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC156.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC157.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC158.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC159.xml.rs": "Failed",
+    "Policy_IIC160.xml.rs": "Failed",
+    "Policy_IIC161.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC162.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC163.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC171.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC172.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC173.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC174.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC175.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC176.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC177.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC178.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC179.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC180.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC181.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC182.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC183.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC184.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC185.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC186.xml.rs": "Failed",
+    "Policy_IIC187.xml.rs": "Failed",
+    "Policy_IIC188.xml.rs": "Failed",
+    "Policy_IIC189.xml.rs": "Failed",
+    "Policy_IIC190.xml.rs": "Failed",
+    "Policy_IIC191.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC192.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC193.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC194.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC195.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC196.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC197.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC198.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC199.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC200.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC201.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC202.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC203.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC204.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC205.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC206.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC207.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC208.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC209.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC210.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC211.xml.rs": "Failed",
+    "Policy_IIC212.xml.rs": "Failed",
+    "Policy_IIC213.xml.rs": "Failed",
+    "Policy_IIC214.xml.rs": "Failed",
+    "Policy_IIC215.xml.rs": "Failed",
+    "Policy_IIC216.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC217.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC218.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IIC219.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IIC220.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IIC221.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC222.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC223.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC224.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC225.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC226.xml.rs": "Failed",
+    "Policy_IIC227.xml.rs": "Failed",
+    "Policy_IIC228.xml.rs": "Failed",
+    "Policy_IIC229.xml.rs": "Failed",
+    "Policy_IIC230.xml.rs": "Failed",
+    "Policy_IIC231.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC232.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC300.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC301.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC302.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC303.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC310.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC311.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC312.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC313.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC320.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC321.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC322.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC323.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC330.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC331.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC332.xml.rs": [
+        "Failed",
+        "Missing response file"
+    ],
+    "Policy_IIC333.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC334.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC335.xml.rs": [
+        "Failed",
+        "Missing response file"
+    ],
+    "Policy_IIC340.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC341.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC342.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC343.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC344.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC345.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC346.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC347.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC348.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC349.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC350.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IIC351.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IIC352.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IIC353.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC354.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC355.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IIC356.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC357.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIC358.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IIC359.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IID001.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IID002.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID003.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID004.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID005.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IID006.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID007.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID008.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID009.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IID010.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID011.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID012.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID013.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IID014.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID015.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID016.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID017.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IID018.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID019.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID020.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID021.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IID022.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID023.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID024.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID025.xml.rs": [
+        "Failed",
+        "true!=false"
+    ],
+    "Policy_IID026.xml.rs": [
+        "Failed",
+        "false!=true"
+    ],
+    "Policy_IID027.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID028.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID300.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID301.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IID302.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID303.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID304.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID305.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID306.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IID307.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID308.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID309.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID310.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID311.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IID312.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IID313.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID314.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID315.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID316.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IID317.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IID318.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID319.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID320.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID330.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID331.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IID332.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID333.xml.rs": "Failed",
+    "Policy_IID340.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IID341.xml.rs": [
+        "Passed",
+        "false=false"
+    ],
+    "Policy_IID342.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IID343.xml.rs": "Failed",
+    "Policy_IIF301_FIXED_NO_XPATH.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIF310_FIXED_NO_XPATH.xml.rs": [
+        "Passed",
+        "true=true"
+    ],
+    "Policy_IIF311.xml.rs": [
+        "Passed",
+        "true=true"
+    ]
+}

@@ -1,5 +1,4 @@
 # .gitignore
-batch_process.py
 log.txt
 failed.txt
 ir/all_ir.json
