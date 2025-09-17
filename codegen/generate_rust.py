@@ -24,7 +24,7 @@ def registe_regex(pattern):
     compiled_bytes = compile_regex.create_dfa_bytes(pattern)
     h = hashlib.md5()
     h.update(pattern.encode('utf-8'))
-    p_hash = h.hexdigest()
+    p_hash = h.hexdigest().upper()
     reg_name = "RE_" + p_hash
     global regex_dict
     if reg_name in regex_dict.keys():
