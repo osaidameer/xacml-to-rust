@@ -25,7 +25,7 @@ This module takes the intermediate representation (IR) as input and generates Ru
 
    ```bash
    git clone https://github.com/osaidameer/xacml-to-rust.git
-   cd your-repo-name
+   cd xacml-to-rust
     ```
 
 2. **Setup Python environment**
