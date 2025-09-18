@@ -5,10 +5,19 @@ from collections import defaultdict
 from datetime import datetime
 
 # Configuration
-base_dir = r".\policy_test_set"
-main_path = r".\main.py"
+base_dir = "policy_test_set"
+main_path = "main.py"
 log_file = "log.txt"
 failed_log_file = "failed.txt"
+# lock_file = None
+lock_file = "results.json"
+if lock_file is not None:
+    import json
+    with open(lock_file, 'r') as f:
+        locked = json.load(f)
+else:
+    locked = None
+
 
 # Tracking
 total = 0
@@ -25,6 +34,9 @@ def log(message):
 def log_failure(message):
     with open(failed_log_file, "a", encoding="utf-8") as f:
         f.write(message + "\n")
+
+if locked is not None:
+    print("[INFO] Filter in use, skip wrong policy")
 
 # Start log
 log(f"\n=== Run started at {datetime.now()} ===")
@@ -53,7 +65,13 @@ for folder in os.listdir(base_dir):
         continue
 
     total += 1
-    log(f"[INFO] Processing {policy_file}")
+    if locked is not None:
+        output_name = f"Policy_{folder}.xml.rs" 
+        if output_name in locked and locked[output_name][0] == 'Passed':
+            log(f"[INFO] Processing {policy_file}")
+        else:
+            log(f"[SKIP] {policy_file} not in lock file or marked as failed, skip")
+            continue
 
     try:
         result = subprocess.run(

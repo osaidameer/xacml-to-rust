@@ -46,6 +46,11 @@ This module takes the intermediate representation (IR) as input and generates Ru
    ```bash
    rustup component add rustfmt
     ```
+6. **Install compile_regex**
+   ```bash
+   cd compile_regex
+   maturin develop --features python
+   ```
 6. **Run tool**
     ```bash
    python3 main.py path/to/policy.xml
