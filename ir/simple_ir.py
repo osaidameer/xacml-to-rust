@@ -340,7 +340,7 @@ if __name__ == "__main__":
     """
 
     import os
-    base_dir = r"C:\Users\Osaid\Desktop\ZKZT\core-develop\pdp-testutils\src\test\resources\conformance\xacml-3.0-from-2.0-ct\mandatory"
+    base_dir = "../policy_test_set"
 
     # Output file to store all IRs
     output_file = "all_ir.json"

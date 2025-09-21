@@ -153,5 +153,5 @@ def parse_xacml_complex(filename: str) -> Policy:
     return Policy.from_xml(root)
 
 if __name__ == "__main__":
-    policy = parse_xacml_complex("../policies/Policy_D01.xml")
+    policy = parse_xacml_complex("../policy_test_set/IIA001/Policy_IIA001.xml")
     print(json.dumps(asdict(policy), indent=2))

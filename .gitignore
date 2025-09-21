@@ -5,6 +5,7 @@ ir/all_ir.json
 misc.py
 output/
 policies/
+original_policy_requests/
 
 # Python
 __pycache__/
