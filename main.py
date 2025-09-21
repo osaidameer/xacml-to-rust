@@ -8,15 +8,15 @@ from codegen.generate_request_response_json import generate_request_json, genera
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Compiler for ZKZT')
-    parser.add_argument('input', help='input file')
+    parser = argparse.ArgumentParser(description='xacml-to-rust')
+    parser.add_argument('policy', help='policy file')
     parser.add_argument('-r', '--request', help='request file')
     parser.add_argument('-s', '--response',  help='response file')
     args = parser.parse_args()
 
-    basename = os.path.basename(args.input)
-    ir = parse_xacml_simple(args.input)
-    crates = generate_input_struct(args.input, f"output/input_definition/{basename[:-4]}.rs")
+    basename = os.path.basename(args.policy)
+    ir = parse_xacml_simple(args.policy)
+    crates = generate_input_struct(args.policy, f"output/input_definition/{basename[:-4]}.rs")
     generate_policy_code(ir, "output/policies_code/", f"{basename[:-4]}.rs", crates)
 
     if args.request:
