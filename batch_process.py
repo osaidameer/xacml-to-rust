@@ -1,3 +1,4 @@
+import sys
 import os
 import subprocess
 import traceback
@@ -9,8 +10,8 @@ base_dir = "policy_test_set"
 main_path = "main.py"
 log_file = "log.txt"
 failed_log_file = "failed.txt"
-# lock_file = None
-lock_file = "results.json"
+lock_file = None
+# lock_file = "results.json"
 if lock_file is not None:
     import json
     with open(lock_file, 'r') as f:
@@ -75,10 +76,10 @@ for folder in os.listdir(base_dir):
 
     try:
         result = subprocess.run(
-            ["python", main_path, policy_file],
+            [sys.executable, main_path, policy_file],
             capture_output=True,
             text=True,
-            timeout=20  # Adjust as needed
+            timeout=20
         )
 
         if result.returncode == 0:

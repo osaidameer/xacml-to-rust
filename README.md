@@ -58,7 +58,7 @@ This module takes the intermediate representation (IR) as input and generates Ru
    
 ## Usage Example
    ```bash
-   python3 main.py [-h] [-r REQUEST] [-s RESPONSE] policy
+   python3 main.py [-h] [-r REQUEST] [-s RESPONSE] [-o OUTPUT] policy
    ```
 
 ## Limitations

@@ -6,11 +6,13 @@ misc.py
 output/
 policies/
 original_policy_requests/
+test_output/
 
 # Python
 __pycache__/
 *.pyc
 .venv/
+.venv
 env/
 *.egg-info/
 

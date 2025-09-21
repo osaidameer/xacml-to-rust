@@ -223,6 +223,8 @@ def render_policy(policy, output_dir):
     )
     global regex_dict
     regex_claim = []
+    # creating directory incase it does not exist already
+    os.makedirs(os.path.dirname(output_dir), exist_ok=True)
     for k, v in regex_dict.items():
         regex_claim.append(f'static {k}: &[u8] = include_bytes!("{k}.bin");')
         with open(os.path.join(output_dir, f'{k}.bin'), 'wb') as f:
@@ -256,7 +258,7 @@ def generate_policy_code(ir, output_dir: str, output_file: str, crates):
         for policy in ir["policies"]:
             policy_id, rule_fns, policy_fn, regex_claim = render_policy(policy, output_dir)
             if policy["target"]:
-                print(policy["target"], policy_id)
+                # print(policy["target"], policy_id)
                 policies_with_targets.append(policy_id)
             policy_ids.append(policy_id)
             policy_functions.append(policy_fn)
