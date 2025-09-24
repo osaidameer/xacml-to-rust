@@ -46,6 +46,14 @@ def parse_xacml_request(xml_string):
 
     return attribute_dict
 
+
+decision_map = {
+    "Permit": True,
+    "NotApplicable": False,
+    "Indeterminate": False,
+    "Deny": False,
+}
+
 def parse_xacml_response(xml_string):
     ns = {'xacml': 'urn:oasis:names:tc:xacml:3.0:core:schema:wd-17'}
     root = etree.fromstring(xml_string.encode("utf-8"))
@@ -56,7 +64,7 @@ def parse_xacml_response(xml_string):
         return None
 
     result = {
-        "decision": decision,
+        "decision": decision_map.get(decision, False),
     }
     return result
 

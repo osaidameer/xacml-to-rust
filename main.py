@@ -7,10 +7,6 @@ from codegen.generate_request_response_json import generate_request_json, genera
 
 
 def main():
-    import sys
-    print("Python executable:", sys.executable)
-    print("Python path:", sys.path)
-
     parser = argparse.ArgumentParser(description='xacml-to-rust')
     parser.add_argument('policy', help='policy file')
     parser.add_argument('-r', '--request', help='request file')
