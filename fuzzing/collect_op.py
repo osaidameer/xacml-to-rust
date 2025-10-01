@@ -37,7 +37,11 @@ def collect_operand_types(op, left, right):
 if __name__ == "__main__":
     # parse all policy to see what operand type are used with what operator
     print(f"Collect info from {TEST_SET_PATH}")
-    for f in tqdm(glob.glob("*/Policy_*.xml", root_dir=TEST_SET_PATH, recursive=True)):
+    with open("../results.json", "r") as f:
+        results = json.load(f)
+    
+    for f in tqdm(results.keys()):
+        f = f.removeprefix("Policy_").removesuffix(".xml.rs") + "/" + f.removesuffix(".rs")
         try:
             j = parse_xacml_simple(TEST_SET_PATH / f)
         except Exception as e:
@@ -55,6 +59,9 @@ if __name__ == "__main__":
             if target:
                 # TODO
                 pass
+    for op in op_map:
+        op_map[op]["left"] = list(op_map[op]["left"])
+        op_map[op]["right"] = list(op_map[op]["right"])
 
     with open("collected_op.json", "w") as f:
         json.dump(op_map, f, indent=2)
