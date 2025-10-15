@@ -27,15 +27,22 @@ TEMP_JSON_PATH = Path(__file__).parent / "temp_jsons"
 #     return val
 
 
-def mutate_op(condition: dict):
+def mutate_op2(condition: dict):
     assert "op" in condition
+    if condition["op"] == "bagsize":
+        return condition
     condition["op"] = op_provider.get_op_from_type(*infer_operend_data_type(condition))
+    left, right = condition["left"], condition["right"]
+    if "op" in left:
+        condition["left"] = mutate_op2(left)
+    if "op" in right:
+        condition["right"] = mutate_op2(right)
     return condition
 
 
 def mutate_policy(j):
     # TODO: more mutator
-    j["condition"] = mutate_op(j["condition"])
+    j["condition"] = mutate_op2(j["condition"])
     return j
 
 
