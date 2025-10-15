@@ -46,6 +46,29 @@ def mutate_policy(j):
     return j
 
 
+def main(policy, rounds, temp_json_path, collect_op):
+    """
+    @param policy: policy name, e.g., IIC351
+    """
+    global op_provider, TEMP_JSON_PATH
+    if collect_op:
+        from .collect_op import main as collect_main
+
+        collect_main()
+    op_provider = OpProvider()
+
+    if temp_json_path:
+        TEMP_JSON_PATH = Path(temp_json_path)
+    os.makedirs(TEMP_JSON_PATH, exist_ok=True)
+
+    j = parse_xacml_simple(TEST_SET_PATH / policy / f"Policy_{policy}.xml")
+    if j["type"] != "Policy":
+        raise NotImplementedError("Only support single policy")
+    for i in range(rounds):
+        j["rules"][0] = mutate_policy(j["rules"][0])
+        yield TEMP_JSON_PATH / f"{policy}_{i}.json", j
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--file", "-f", type=str, required=False, default="IIC351")
@@ -56,22 +79,7 @@ if __name__ == "__main__":
     parser.add_argument("--temp-json-path", type=str, required=False, default="")
 
     args = parser.parse_args()
-
-    if args.collect_op:
-        from .collect_op import main as collect_main
-
-        collect_main()
-    op_provider = OpProvider()
-
-    if args.temp_json_path:
-        TEMP_JSON_PATH = Path(args.temp_json_path)
-    os.makedirs(TEMP_JSON_PATH, exist_ok=True)
-
-    j = parse_xacml_simple(TEST_SET_PATH / args.file / f"Policy_{args.file}.xml")
-    if j["type"] != "Policy":
-        raise NotImplementedError("Only support single policy")
-    for i in range(args.rounds):
-        j["rules"][0] = mutate_policy(j["rules"][0])
-        with open(TEMP_JSON_PATH / f"{args.file}_{i}.json", "w") as f:
-            json.dump(j, f, indent=4)
+    for p, j in main(args.file, args.rounds, args.temp_json_path, args.collect_op):
+        with open(p, "w") as f:
+            json.dump(j, f, indent=2)
     print(f"Mutated policies are saved to {TEMP_JSON_PATH}")
