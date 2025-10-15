@@ -1,47 +1,68 @@
-import sys
-sys.path.append("..")
-
 from ir.simple_ir import parse_xacml_simple
-import glob
 import json
 from tqdm import tqdm
 from pathlib import Path
 
-TEST_SET_PATH = Path("../policy_test_set").absolute()
+TEST_SET_PATH = Path(__file__).parent / ".." / "policy_test_set"
 
 op_map = {}
+
+
+def infer_operend_data_type(condition: dict):
+    left, right = condition["left"], condition["right"]
+    lt, rt = "", ""
+    if "data_type" not in left:
+        if "op" in left:
+            if left["op"] == "bagsize":
+                lt = "integer"
+            else:
+                lt = "boolean"
+    else:
+        lt = left["data_type"]
+    if "data_type" not in right:
+        if "op" in right:
+            if right["op"] == "bagsize":
+                rt = "integer"
+            else:
+                rt = "boolean"
+    else:
+        rt = right["data_type"]
+    return lt, rt
+
 
 def collect_entry(comp):
     if not comp:
         return
-    print(comp)
     if "op" not in comp or "left" not in comp or "right" not in comp:
         return
-    # TODO bagsize
     op, left, right = comp["op"], comp["left"], comp["right"]
     if "op" in left:
         collect_entry(left)
-        left["data_type"] = "boolean"
     if "op" in right:
         collect_entry(right)
-        right["data_type"] = "boolean"
+    left["data_type"], right["data_type"] = infer_operend_data_type(comp)
     collect_operand_types(op, left, right)
+
 
 def collect_operand_types(op, left, right):
     global op_map
     if op not in op_map:
-        op_map[op] = {"left": set(), "right": set()}
-    op_map[op]["left"].add(left["data_type"])
-    op_map[op]["right"].add(right["data_type"])
+        op_map[op] = set()
+    op_map[op].add((left["data_type"], right["data_type"]))
 
-if __name__ == "__main__":
+
+def main():
     # parse all policy to see what operand type are used with what operator
     print(f"Collect info from {TEST_SET_PATH}")
-    with open("../results.json", "r") as f:
+    with open(TEST_SET_PATH / ".." / "results.json", "r") as f:
         results = json.load(f)
-    
+
     for f in tqdm(results.keys()):
-        f = f.removeprefix("Policy_").removesuffix(".xml.rs") + "/" + f.removesuffix(".rs")
+        f = (
+            f.removeprefix("Policy_").removesuffix(".xml.rs")
+            + "/"
+            + f.removesuffix(".rs")
+        )
         try:
             j = parse_xacml_simple(TEST_SET_PATH / f)
         except Exception as e:
@@ -60,8 +81,11 @@ if __name__ == "__main__":
                 # TODO
                 pass
     for op in op_map:
-        op_map[op]["left"] = list(op_map[op]["left"])
-        op_map[op]["right"] = list(op_map[op]["right"])
+        op_map[op] = list(op_map[op])
 
-    with open("collected_op.json", "w") as f:
+    with open(Path(__file__).parent / "collected_op.json", "w") as f:
         json.dump(op_map, f, indent=2)
+
+
+if __name__ == "__main__":
+    main()
