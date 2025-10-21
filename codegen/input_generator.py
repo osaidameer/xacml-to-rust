@@ -36,6 +36,10 @@ def extract_inputs_from_policy(xml_file):
         attr_id = elem.get("AttributeId", "").strip()
         attr_cat = elem.get("Category", "").strip()
         data_type = elem.get("DataType", "").strip()
+        from_jwt = elem.get("FromJWT", "").strip()
+
+        if from_jwt:
+            continue
 
         if attr_id and data_type:
             name = f"{rustify_name(attr_cat)}_{rustify_name(attr_id)}"

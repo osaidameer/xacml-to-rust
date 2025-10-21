@@ -7,6 +7,10 @@ output/
 policies/
 original_policy_requests/
 test_output/
+input_test.py
+.gitignore
+rust_struct_fields.json
+field_frequencies.json
 
 # Python
 __pycache__/

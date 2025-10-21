@@ -8,6 +8,8 @@ import hashlib
 
 right_f64_dict = {"INF": "f64::INFINITY", "-INF": "f64::NEG_INFINITY", "NaN": "f64::NAN"}
 regex_dict = dict()
+jwt_field = ""
+jwt = False
 
 # Load external templates
 def load_template(filename):
@@ -159,11 +161,17 @@ def rust_expr(node):
 
 def rust_operand(op):
     data_type_dict = {"date": "NaiveDate", "time": "NaiveTime", "dateTime": "DateTime<FixedOffset>"}
+    global jwt_field, jwt
     if "op" in op and "type" not in op:
         return f"({rust_expr(op)})"
 
     if op["type"] == "attribute":
+        if op["from_jwt"]:
+            jwt_field = op["id"]
+            return f"jwt_dict[0]"
         field_name = f"inp.{rustify_name(op['category'])}_{rustify_name(op['id'])}"
+        if op["id"] == "jwt":
+            jwt = True
         if op["data_type"] == "time":
             if not op["is_vector"]:
                 return f"parse_time(&{field_name})"
@@ -232,6 +240,7 @@ def render_policy(policy, output_dir):
     return policy_id, rule_functions, policy_fn, regex_claim
 
 def generate_policy_code(ir, output_dir: str, output_file: str, crates):
+    global jwt_field, jwt
     output_path = os.path.join(output_dir, output_file)
     rule_functions = []
     policy_functions = []
@@ -251,7 +260,9 @@ def generate_policy_code(ir, output_dir: str, output_file: str, crates):
             regex_claims=regex_claim,
             policyset_function="",
             policy_name=policy_id,
-            policyset_name=""
+            policyset_name="",
+            jwt=jwt,
+            jwt_field=jwt_field,
         )
     elif ir["type"] == "PolicySet":
         policies_with_targets = []
@@ -286,7 +297,9 @@ def generate_policy_code(ir, output_dir: str, output_file: str, crates):
             policyset_function=policyset_fn,
             regex_claims=regex_claims,
             policy_name="",
-            policyset_name=policyset_name
+            policyset_name=policyset_name,
+            jwt=jwt,
+            jwt_field=jwt_field,
         )
 
     else:

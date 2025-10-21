@@ -1,7 +1,0 @@
-{
-    "access_subject_subject_id": "cn=Julius Hibbert,o=Medico Corp, c=US",
-    "access_subject_age": 45,
-    "resource_resource_id": "http://medico.com/record/patient/BartSimpson",
-    "action_action_id": "read",
-    "environment_bart_simpson_age": 10
-}

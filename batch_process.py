@@ -57,7 +57,10 @@ for folder in os.listdir(base_dir):
         continue
 
     policy_file = os.path.join(folder_path, f"Policy_{folder}.xml")
-    if not os.path.exists(policy_file):
+    request_file = os.path.join(folder_path, f"Request_{folder}.xml")
+    response_file = os.path.join(folder_path, f"Response_{folder}.xml")
+
+    if not os.path.exists(policy_file) or not os.path.exists(request_file) or not os.path.exists(response_file):
         failures += 1
         error_types["Skipped"].append(folder)
         message = f"[SKIP] {folder}: Policy file not found."
@@ -76,7 +79,7 @@ for folder in os.listdir(base_dir):
 
     try:
         result = subprocess.run(
-            [sys.executable, main_path, policy_file],
+            [sys.executable, main_path, policy_file, "-r", request_file, "-s", response_file, "-o", "zkvm_testing"],
             capture_output=True,
             text=True,
             timeout=20

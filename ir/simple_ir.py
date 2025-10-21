@@ -242,6 +242,8 @@ def parse_apply(apply_elem, ns) -> Dict:
     if "one-and-only" in function_id:
         if len(children) != 1:
             raise ValueError(f"one-and-only requires exactly 1 argument, got {len(children)}")
+
+        #print(children[0].get("AttributeId"))
         return parse_operand(children[0], ns)
 
     """
@@ -308,7 +310,7 @@ def parse_operand(elem, ns) -> Optional[Dict]:
         return {
             "type": "value",
             "data_type": simplify_urn(elem.get("DataType")),
-            "value": elem.text
+            "value": elem.text or ""
         }
     elif tag == "AttributeDesignator":
         bag_functions = ["bag", "bag-size", "is-in", "union", "intersection", "subset", "set-equals",
@@ -321,24 +323,29 @@ def parse_operand(elem, ns) -> Optional[Dict]:
             elif any(vf in func_id for vf in bag_functions):
                 is_vector = True
                 break
+
+        # adding check for custom attribute FromJWT
+        from_jwt = simplify_urn(elem.get("FromJWT", "false")).lower() == "true"
+
+        #print(simplify_urn(elem.get("AttributeId")))
         return {
             "type": "attribute",
             "id": simplify_urn(elem.get("AttributeId")),
             "data_type": simplify_urn(elem.get("DataType")),
             "category": simplify_urn(elem.get("Category")),
             "is_vector": is_vector,
+            "from_jwt": from_jwt,
         }
     else:
         raise ValueError(f"Unsupported operand type: {tag}")
 
 
 if __name__ == "__main__":
-    """
-    ir = parse_xacml_simple("../policies/Policy_IIC351.xml")
+
+    ir = parse_xacml_simple("../test_policy.xml")
     print(json.dumps(ir, indent=2))
     print("IR generated successfully!")
     """
-
     import os
     base_dir = "../policy_test_set"
 
@@ -347,8 +354,8 @@ if __name__ == "__main__":
     all_irs = {}
 
     # Loop through IIC120 to IIC163
-    for i in range(135, 136):
-        key = f"IIC{i}"
+    for i in range(311, 312):
+        key = f"IIF{i}"
         folder = os.path.join(base_dir, key)
         filename = f"Policy_{key}.xml"
         file_path = os.path.join(folder, filename)
@@ -368,4 +375,5 @@ if __name__ == "__main__":
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(all_irs, f, indent=2)
 
-    print(f"\n✅ All IRs written to {output_file}")
+    print(f"\n All IRs written to {output_file}")
+    """
