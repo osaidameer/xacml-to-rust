@@ -52,7 +52,7 @@ def arg_routing(args: argparse.Namespace):
             fuzz_main(
                 basename.removeprefix("Policy_"),
                 args.fuzzing_rounds,
-                args.fuzzing_temp_json_path,
+                output_dir,
                 args.fuzzing_collect_op,
             )
         ):
@@ -63,7 +63,12 @@ def arg_routing(args: argparse.Namespace):
                 crates=crates,
             )
     else:
-        merge_main(basename.removeprefix("Policy_"), args.fuzzing_temp_json_path, args.merge_level)
+        merge_main(
+            basename.removeprefix("Policy_"),
+            args.fuzzing_temp_json_path,
+            output_dir,
+            args.merge_level,
+        )
 
     print(
         f"Mutated policies JSON are saved to {args.fuzzing_temp_json_path or TEMP_JSON_PATH}"

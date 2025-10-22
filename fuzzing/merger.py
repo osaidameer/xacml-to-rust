@@ -2,7 +2,12 @@ from codegen.generate_request_response_json import (
     parse_xacml_request,
     parse_xacml_response,
 )
-from codegen.input_generator import extract_inputs_from_policy, generate_input_struct
+from codegen.generate_rust import generate_policy_code
+from codegen.input_generator import (
+    extract_inputs_from_policy,
+    generate_input_struct,
+    required_crates,
+)
 from fuzzing.config import TEMP_JSON_PATH, TEST_SET_PATH
 import json
 import random
@@ -32,7 +37,9 @@ def parse_resp(path):
     return parse_xacml_response(content)
 
 
-def main(policy_name: str, new_temp_json_path, merge_level: int = 1):
+def main(
+    policy_name: str, new_temp_json_path: str, output_dir: str, merge_level: int = 1
+):
     global TEMP_JSON_PATH
     if new_temp_json_path != "":
         TEMP_JSON_PATH = Path(new_temp_json_path)
@@ -47,6 +54,9 @@ def main(policy_name: str, new_temp_json_path, merge_level: int = 1):
     policy_response = parse_resp(
         TEST_SET_PATH / policy_name / f"Response_{policy_name}.xml"
     )
+    policy_crates = required_crates(
+        TEST_SET_PATH / policy_name / f"Policy_{policy_name}.xml"
+    )
     lvl = 0
     while lvl < merge_level:
         new_policy = (
@@ -59,6 +69,7 @@ def main(policy_name: str, new_temp_json_path, merge_level: int = 1):
         new_policy = parse_xacml_simple(new_policy_policy)
         new_policy_inp = parse_req(new_policy_request)
         new_policy_resp = parse_resp(new_policy_response)
+        new_policy_crates = required_crates(new_policy_policy)
 
         inp_conflict = False
         for k, v in policy_inputs.items():
@@ -80,10 +91,13 @@ def main(policy_name: str, new_temp_json_path, merge_level: int = 1):
         top_op = random.choice(OPS)
         policy["rules"][0]["condition"] = {
             "op": top_op,
-            "left": policy["rules"][0]["condition"],
-            "right": new_policy["rules"][0]["condition"],
+            "children": [
+                policy["rules"][0]["condition"],
+                new_policy["rules"][0]["condition"],
+            ],
         }
         policy_inputs.update(new_policy_inp)
+        # maybe consider multiple AND/OR instead of only two children?
         if top_op == "AND":
             policy_response["decision"] = (
                 policy_response["decision"] and new_policy_resp["decision"]
@@ -92,6 +106,7 @@ def main(policy_name: str, new_temp_json_path, merge_level: int = 1):
             policy_response["decision"] = (
                 policy_response["decision"] or new_policy_resp["decision"]
             )
+        policy_crates.update(new_policy_crates)
         print(f"Merged {new_policy_path} into current policy with {top_op}")
         lvl += 1
     with open(
@@ -99,7 +114,7 @@ def main(policy_name: str, new_temp_json_path, merge_level: int = 1):
     ) as f:
         json.dump(policy, f, indent=2)
     with open(
-        TEMP_JSON_PATH / f"Policy_{policy_name}_merged_level{merge_level}_inputs.rs",
+        TEMP_JSON_PATH / f"Policy_{policy_name}_merged_level{merge_level}_inputs.json",
         "w",
     ) as f:
         json.dump(policy_inputs, f, indent=2)
@@ -109,3 +124,10 @@ def main(policy_name: str, new_temp_json_path, merge_level: int = 1):
         "w",
     ) as f:
         json.dump(policy_response, f, indent=2)
+    output_dir = Path(output_dir) / "merged_policies_code"
+    generate_policy_code(
+        policy,
+        output_dir=output_dir,
+        output_file=f"Policy_{policy_name}_merged_level{merge_level}.rs",
+        crates=policy_crates,
+    )
