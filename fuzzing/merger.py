@@ -62,7 +62,7 @@ def main(
     if f"Policy_{policy_name}.xml.rs" not in policies:
         print("Warning: current policy not in result.json(it doesn't pass test)")
     policies.remove(f"Policy_{policy_name}.xml.rs")
-    while lvl < merge_level:
+    while lvl < merge_level and len(policies) > 0:
         new_policy = random.choice(policies)
         # remove dup
         policies.remove(new_policy)
@@ -114,18 +114,21 @@ def main(
         policy_crates.update(new_policy_crates)
         print(f"Merged {new_policy_path} into current policy with {top_op}")
         lvl += 1
+    if lvl != merge_level:
+        print(
+            f"WARNING: Only merged {lvl} times, less than requested {merge_level} times. Possibly due to input conflicts."
+        )
     with open(
-        TEMP_JSON_PATH / f"Policy_{policy_name}_merged_level{merge_level}.json", "w"
+        TEMP_JSON_PATH / f"Policy_{policy_name}_merged_level{lvl}.json", "w"
     ) as f:
         json.dump(policy, f, indent=2)
     with open(
-        TEMP_JSON_PATH / f"Policy_{policy_name}_merged_level{merge_level}_inputs.json",
+        TEMP_JSON_PATH / f"Policy_{policy_name}_merged_level{lvl}_inputs.json",
         "w",
     ) as f:
         json.dump(policy_inputs, f, indent=2)
     with open(
-        TEMP_JSON_PATH
-        / f"Policy_{policy_name}_merged_level{merge_level}_response.json",
+        TEMP_JSON_PATH / f"Policy_{policy_name}_merged_level{lvl}_response.json",
         "w",
     ) as f:
         json.dump(policy_response, f, indent=2)
@@ -133,6 +136,6 @@ def main(
     generate_policy_code(
         policy,
         output_dir=output_dir,
-        output_file=f"Policy_{policy_name}_merged_level{merge_level}.rs",
+        output_file=f"Policy_{policy_name}_merged_level{lvl}.rs",
         crates=policy_crates,
     )
