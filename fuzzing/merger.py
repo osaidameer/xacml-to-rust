@@ -58,10 +58,15 @@ def main(
         TEST_SET_PATH / policy_name / f"Policy_{policy_name}.xml"
     )
     lvl = 0
+    # remove dup
+    if f"Policy_{policy_name}.xml.rs" not in policies:
+        print("Warning: current policy not in result.json(it doesn't pass test)")
+    policies.remove(f"Policy_{policy_name}.xml.rs")
     while lvl < merge_level:
-        new_policy = (
-            random.choice(policies).removeprefix("Policy_").removesuffix(".xml.rs")
-        )
+        new_policy = random.choice(policies)
+        # remove dup
+        policies.remove(new_policy)
+        new_policy = new_policy.removeprefix("Policy_").removesuffix(".xml.rs")
         new_policy_path = TEST_SET_PATH / new_policy
         new_policy_policy = new_policy_path / f"Policy_{new_policy}.xml"
         new_policy_request = new_policy_path / f"Request_{new_policy}.xml"
