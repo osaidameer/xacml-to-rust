@@ -13,4 +13,4 @@ python = ["dep:pyo3"]
 
 [dependencies]
 regex-automata = "0.4"
-pyo3 = { version = "0.21", features = ["extension-module"], optional = true }
+pyo3 = { version = "0.27", features = ["extension-module"], optional = true }

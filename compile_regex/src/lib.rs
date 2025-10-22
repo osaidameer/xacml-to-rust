@@ -25,6 +25,7 @@ pub fn _create_dfa_string(pattern: &str) -> Result<String, Box<dyn Error>> {
 }
 
 #[cfg(feature = "python")]
+#[pyo3::pymodule]
 mod py {
     use super::*;
     use pyo3::exceptions::PyValueError;
@@ -32,9 +33,9 @@ mod py {
 
     #[pyfunction]
     fn create_dfa_bytes(pattern: &str) -> PyResult<pyo3::Py<pyo3::types::PyBytes>> {
-        Python::with_gil(|py| {
+        Python::attach(|py| {
             _create_dfa(pattern)
-                .map(|buf| pyo3::types::PyBytes::new_bound(py, &buf).into())
+                .map(|buf| pyo3::types::PyBytes::new(py, &buf).into())
                 .map_err(|e| PyValueError::new_err(format!("failed to build DFA: {e}")))
         })
     }
@@ -47,9 +48,9 @@ mod py {
 
 
     #[pymodule]
-    fn compile_regex(_py: Python, m: &PyModule) -> PyResult<()> {
-        m.add_function(pyo3::wrap_pyfunction!(create_dfa_str, m)?)?;
-        m.add_function(pyo3::wrap_pyfunction!(create_dfa_bytes, m)?)?;
+    fn compile_regex(m: &Bound<'_, PyModule>) -> PyResult<()> {
+        m.add_function(wrap_pyfunction!(create_dfa_str, m)?)?;
+        m.add_function(wrap_pyfunction!(create_dfa_bytes, m)?)?;
         Ok(())
     }
 }
