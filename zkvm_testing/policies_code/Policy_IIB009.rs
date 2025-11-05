@@ -1,7 +1,8 @@
 use policy_core::Inputs;
+use risc0_zkvm::guest::env;
+
 use regex_automata::dfa::{dense::DFA, Automaton};
 use regex_automata::Input;
-use risc0_zkvm::guest::env;
 
 fn eval_regex(regex_input: &str, regex_exp: &[u8]) -> bool {
     match DFA::from_bytes(regex_exp) {
@@ -16,8 +17,8 @@ fn eval_regex(regex_input: &str, regex_exp: &[u8]) -> bool {
     }
 }
 
-static RE_5466EEFA6503C6D12F4EEA5697E9F7B5: &[u8] =
-    include_bytes!("RE_5466EEFA6503C6D12F4EEA5697E9F7B5.bin");
+static RE_0D7FE33937DB69EB4A2BFA203B7B3734: &[u8] =
+    include_bytes!("RE_0D7FE33937DB69EB4A2BFA203B7B3734.bin");
 
 #[derive(Debug, PartialEq)]
 enum Result {
@@ -29,7 +30,7 @@ enum Result {
 fn evaluate_target_policy_rule(inp: &Inputs) -> bool {
     (("Julius Hibbert" == inp.access_subject_subject_id)
         && ("http://medico.com/record/patient/BartSimpson" == inp.resource_resource_id)
-        && (eval_regex(&inp.action_action_id, &RE_5466EEFA6503C6D12F4EEA5697E9F7B5)))
+        && (eval_regex(&inp.action_action_id, &RE_0D7FE33937DB69EB4A2BFA203B7B3734)))
 }
 
 fn evaluate_rule_policy_rule(inp: &Inputs) -> Result {
@@ -40,7 +41,15 @@ fn evaluate_rule_policy_rule(inp: &Inputs) -> Result {
     return Result::Permit;
 }
 
+fn evaluate_target_policy(inp: &Inputs) -> bool {
+    true
+}
+
 fn evaluate_policy_policy(inp: &Inputs) -> Result {
+    if !evaluate_target_policy(inp) {
+        return Result::NotApplicable;
+    }
+
     let results = vec![evaluate_rule_policy_rule(inp)];
 
     //deny-overrides

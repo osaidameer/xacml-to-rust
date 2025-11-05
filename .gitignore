@@ -11,6 +11,13 @@ input_test.py
 .gitignore
 rust_struct_fields.json
 field_frequencies.json
+zkvm_testing
+flake.*
+test_policy.xml
+test_request.xml
+generate_jwt.py
+jwt_key
+public_key.pem
 
 # Python
 __pycache__/

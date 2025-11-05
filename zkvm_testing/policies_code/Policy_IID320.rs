@@ -44,7 +44,15 @@ fn evaluate_rule_policy3_rule3(inp: &Inputs) -> Result {
     }
 }
 
+fn evaluate_target_policy1(inp: &Inputs) -> bool {
+    true
+}
+
 fn evaluate_policy_policy1(inp: &Inputs) -> Result {
+    if !evaluate_target_policy1(inp) {
+        return Result::NotApplicable;
+    }
+
     let results = vec![evaluate_rule_policy1_rule1(inp)];
 
     //permit-overrides || deny-unless-permit
@@ -62,7 +70,15 @@ fn evaluate_policy_policy1(inp: &Inputs) -> Result {
     return Result::NotApplicable;
 }
 
+fn evaluate_target_policy2(inp: &Inputs) -> bool {
+    true
+}
+
 fn evaluate_policy_policy2(inp: &Inputs) -> Result {
+    if !evaluate_target_policy2(inp) {
+        return Result::NotApplicable;
+    }
+
     let results = vec![evaluate_rule_policy2_rule2(inp)];
 
     //permit-overrides || deny-unless-permit
@@ -80,7 +96,15 @@ fn evaluate_policy_policy2(inp: &Inputs) -> Result {
     return Result::NotApplicable;
 }
 
+fn evaluate_target_policy3(inp: &Inputs) -> bool {
+    true
+}
+
 fn evaluate_policy_policy3(inp: &Inputs) -> Result {
+    if !evaluate_target_policy3(inp) {
+        return Result::NotApplicable;
+    }
+
     let results = vec![evaluate_rule_policy3_rule3(inp)];
 
     //permit-overrides || deny-unless-permit

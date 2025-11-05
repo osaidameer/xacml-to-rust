@@ -1,0 +1,6 @@
+{
+    "jwt_field": [
+        "access_subject_subject_id",
+        "resource_author"
+    ]
+}

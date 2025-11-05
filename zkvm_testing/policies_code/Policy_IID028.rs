@@ -163,7 +163,21 @@ fn evaluate_policyset_policyset(inp: &Inputs) -> bool {
         //continues in the case of NotApplicable, condition not needed, adding comment for clarity
     }
     if counter == 1 {
-        return true;
+        //return true;
+        let results = vec![
+            evaluate_policy_policy1(inp),
+            evaluate_policy_policy2(inp),
+            evaluate_policy_policy3(inp),
+            evaluate_policy_policy4(inp),
+        ];
+        for res in &results {
+            if *res == Result::Deny {
+                return false;
+            }
+            if *res == Result::Permit {
+                return true;
+            }
+        }
     }
     return false;
 }

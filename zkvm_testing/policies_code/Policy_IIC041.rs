@@ -3,6 +3,8 @@ use risc0_zkvm::guest::env;
 
 
 
+
+
 #[derive(Debug, PartialEq)]
 enum Result {
     Permit,
@@ -39,8 +41,16 @@ fn evaluate_rule_policy_rule(inp: &Inputs) -> Result {
 
 
 
+fn evaluate_target_policy(inp: &Inputs) -> bool {
+    true
+}
+
 
 fn evaluate_policy_policy(inp: &Inputs) -> Result {
+    
+    if !evaluate_target_policy(inp) {
+        return Result::NotApplicable;
+    }
     
 
     let results = vec![

@@ -324,9 +324,6 @@ def parse_operand(elem, ns) -> Optional[Dict]:
                 is_vector = True
                 break
 
-        # adding check for custom attribute FromJWT
-        from_jwt = simplify_urn(elem.get("FromJWT", "false")).lower() == "true"
-
         #print(simplify_urn(elem.get("AttributeId")))
         return {
             "type": "attribute",
@@ -334,7 +331,6 @@ def parse_operand(elem, ns) -> Optional[Dict]:
             "data_type": simplify_urn(elem.get("DataType")),
             "category": simplify_urn(elem.get("Category")),
             "is_vector": is_vector,
-            "from_jwt": from_jwt,
         }
     else:
         raise ValueError(f"Unsupported operand type: {tag}")

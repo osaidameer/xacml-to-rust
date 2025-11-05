@@ -3,12 +3,6 @@ use policy_core::Inputs;
 use risc0_zkvm::guest::env;
 use std::collections::HashSet;
 
-#[derive(Debug, PartialEq)]
-enum Result {
-    Permit,
-    Deny,
-    NotApplicable,
-}
 fn parse_duration(raw: &str) -> String {
     let is_negative = raw.starts_with('-');
     let trimmed = raw.trim_start_matches('-');
@@ -20,6 +14,13 @@ fn parse_duration(raw: &str) -> String {
     } else {
         parsed
     }
+}
+
+#[derive(Debug, PartialEq)]
+enum Result {
+    Permit,
+    Deny,
+    NotApplicable,
 }
 
 fn evaluate_cond_policy_rule(inp: &Inputs) -> bool {
@@ -42,7 +43,15 @@ fn evaluate_rule_policy_rule(inp: &Inputs) -> Result {
     }
 }
 
+fn evaluate_target_policy(inp: &Inputs) -> bool {
+    true
+}
+
 fn evaluate_policy_policy(inp: &Inputs) -> Result {
+    if !evaluate_target_policy(inp) {
+        return Result::NotApplicable;
+    }
+
     let results = vec![evaluate_rule_policy_rule(inp)];
 
     //deny-overrides

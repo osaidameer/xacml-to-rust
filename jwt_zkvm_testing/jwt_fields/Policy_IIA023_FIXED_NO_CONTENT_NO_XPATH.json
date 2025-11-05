@@ -1,0 +1,7 @@
+{
+    "jwt_field": [
+        "access_subject_subject_id",
+        "resource_resource_id",
+        "action_action_id"
+    ]
+}

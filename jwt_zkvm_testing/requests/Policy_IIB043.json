@@ -1,0 +1,6 @@
+{
+    "access_subject_subject_id": "Julius Hibbert",
+    "resource_resource_id": "http://medico.com/record/patient/BartSimpson",
+    "resource_author": "Bart Simpson",
+    "action_action_id": "read"
+}

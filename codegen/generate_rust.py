@@ -1,3 +1,5 @@
+from operator import truediv
+
 from jinja2 import Template
 from codegen.input_generator import rustify_name
 import subprocess
@@ -8,8 +10,16 @@ import hashlib
 
 right_f64_dict = {"INF": "f64::INFINITY", "-INF": "f64::NEG_INFINITY", "NaN": "f64::NAN"}
 regex_dict = dict()
-jwt_field = ""
-jwt = False
+data_type_dict = {
+    "date": "NaiveDate",
+    "time": "NaiveTime",
+    "dateTime": "DateTime<FixedOffset>"
+}
+parse_funcs = {
+    "time": "parse_time",
+    "yearMonthDuration": "parse_duration",
+    "dayTimeDuration": "parse_duration",
+}
 
 # Load external templates
 def load_template(filename):
@@ -21,6 +31,7 @@ rule_template = load_template("rule_template.jinja")
 policy_template = load_template("policy_template.jinja")
 policyset_template = load_template("policyset_template.jinja")
 master_template = load_template("master_template.jinja")
+helper_template = load_template("helper_template.jinja")
 
 def registe_regex(pattern):
     compiled_bytes = compile_regex.create_dfa_bytes(pattern)
@@ -28,6 +39,7 @@ def registe_regex(pattern):
     h.update(pattern.encode('utf-8'))
     p_hash = h.hexdigest().upper()
     reg_name = "RE_" + p_hash
+    #print(reg_name)
     global regex_dict
     if reg_name in regex_dict.keys():
         assert compiled_bytes == regex_dict[reg_name], "Error: Regist two regular expression with same name"
@@ -36,8 +48,9 @@ def registe_regex(pattern):
     return reg_name
 
 def handle_regex(node):
-    pattern = rust_operand(node["left"])
+    pattern = rust_operand(node["left"], for_regex=True)
     string_to_match = rust_operand(node["right"])
+    # print(string_to_match)
     regex_name = registe_regex(pattern)
     return f'eval_regex(&{string_to_match}, &{regex_name})'
     # return f'Regex::new(r{pattern}).unwrap().is_match(&{string_to_match})'
@@ -159,41 +172,50 @@ def rust_expr(node):
         return handler(node, method)
     return handler(node)
 
-def rust_operand(op):
-    data_type_dict = {"date": "NaiveDate", "time": "NaiveTime", "dateTime": "DateTime<FixedOffset>"}
-    global jwt_field, jwt
+
+def rust_operand(op, for_regex=False):
+    global data_type_dict, parse_funcs
+
     if "op" in op and "type" not in op:
         return f"({rust_expr(op)})"
 
     if op["type"] == "attribute":
-        if op["from_jwt"]:
-            jwt_field = op["id"]
-            return f"jwt_dict[0]"
+
         field_name = f"inp.{rustify_name(op['category'])}_{rustify_name(op['id'])}"
-        if op["id"] == "jwt":
-            jwt = True
-        if op["data_type"] == "time":
-            if not op["is_vector"]:
-                return f"parse_time(&{field_name})"
-            else:
-                return f"{field_name}.iter().map(|x| parse_time(x)).collect()"
-        elif op["data_type"] in {"yearMonthDuration", "dayTimeDuration"}:
-            if not op["is_vector"]:
-                return f"parse_duration(&{field_name})"
-            else:
-                return f"{field_name}.iter().map(|x| parse_duration(x)).collect()"
+
+        def rust_parse_call(func_name):
+            if op["is_vector"]:
+                return f"{field_name}.iter().map(|x| {func_name}(x)).collect()"
+            return f"{func_name}(&{field_name})"
+
+        if op["data_type"] in parse_funcs:
+            return rust_parse_call(parse_funcs[op["data_type"]])
+
         return f"{field_name}"
 
     elif op["type"] == "value":
-        if op["data_type"] in {"string", "anyURI", "rfc822Name", "hexBinary", "base64Binary"}:
-            return f'"{op["value"]}"'
-        elif op["data_type"] in {"date", "dateTime"}:
-            return f'"{op["value"]}".parse::<{data_type_dict[op["data_type"]]}>().unwrap()'
-        elif op["data_type"] == "time":
-            return f'parse_time("{op["value"]}")'
-        elif op["data_type"] in {"yearMonthDuration", "dayTimeDuration"}:
-            return f'parse_duration("{op["value"]}")'
-        return str(op["value"])
+        string_types = {"string", "anyURI", "rfc822Name", "hexBinary", "base64Binary"}
+        date_types = {"date", "dateTime"}
+        duration_types = {"yearMonthDuration", "dayTimeDuration"}
+        data_type = op["data_type"]
+        value = op["value"]
+
+        if data_type in string_types:
+            if for_regex:
+                return value
+            return f'"{value}"'
+
+        if data_type in date_types:
+            rust_type = data_type_dict[data_type]
+            return f'"{value}".parse::<{rust_type}>().unwrap()'
+
+        if data_type == "time":
+            return f'parse_time("{value}")'
+
+        if data_type in duration_types:
+            return f'parse_duration("{value}")'
+
+        return str(value)
 
     else:
         raise ValueError(f"Unsupported operand type: {op['type']}")
@@ -212,7 +234,6 @@ def render_rule(rule, policy_id):
         effect=rule["effect"]
     )
 
-
 # separated policy rendering function from original function to support PolicySet
 def render_policy(policy, output_dir):
     rule_functions = []
@@ -224,7 +245,7 @@ def render_policy(policy, output_dir):
         rule_functions.append(rule_fn)
 
     policy_fn = policy_template.render(
-        target_expr=rust_expr(policy["target"]),
+        target_expr=rust_expr(policy["target"]) if policy["target"] else "true",
         algorithm=policy["algorithm"],
         policy_name=policy_id,
         rule_ids=rule_ids
@@ -239,38 +260,48 @@ def render_policy(policy, output_dir):
             f.write(v)
     return policy_id, rule_functions, policy_fn, regex_claim
 
-def generate_policy_code(ir, output_dir: str, output_file: str, crates):
-    global jwt_field, jwt
+def generate_policy_code(ir, output_dir: str, output_file: str, crates, jwt=False, fields=None):
+    if fields is None:
+        fields = []
     output_path = os.path.join(output_dir, output_file)
     rule_functions = []
     policy_functions = []
     policy_ids = []
     regex_claims = []
+    #jwt_fields = ', '.join(f'"{f}"' for f in fields)
 
     if ir["type"] == "Policy":
         policy_id, rule_functions, policy_fn, regex_claim = render_policy(ir, output_dir)
+
+        helper_function = helper_template.render(
+            regex=crates["regex"],
+            regex_claims=regex_claim,
+            jwt=jwt,
+            #jwt_fields=jwt_fields,
+            time=crates["time"],
+            duration=crates["duration"],
+        )
+
         rendered_master = master_template.render(
             set=crates["set"],
-            regex=crates["regex"],
             time=crates["time"],
             date=crates["datetime"],
             duration=crates["duration"],
+            helper_functions=helper_function,
             rule_functions=rule_functions,
             policy_functions=[policy_fn],
-            regex_claims=regex_claim,
             policyset_function="",
             policy_name=policy_id,
             policyset_name="",
             jwt=jwt,
-            jwt_field=jwt_field,
         )
     elif ir["type"] == "PolicySet":
         policies_with_targets = []
         for policy in ir["policies"]:
             policy_id, rule_fns, policy_fn, regex_claim = render_policy(policy, output_dir)
-            if policy["target"]:
+            #if policy["target"]:
                 # print(policy["target"], policy_id)
-                policies_with_targets.append(policy_id)
+            policies_with_targets.append(policy_id)
             policy_ids.append(policy_id)
             policy_functions.append(policy_fn)
             rule_functions.extend(rule_fns)
@@ -286,20 +317,27 @@ def generate_policy_code(ir, output_dir: str, output_file: str, crates):
             policies_with_targets=policies_with_targets
         )
 
+        helper_function = helper_template.render(
+            regex=crates["regex"],
+            regex_claims=regex_claims,
+            jwt=jwt,
+            #jwt_fields=jwt_fields,
+            time=crates["time"],
+            duration=crates["duration"],
+        )
+
         rendered_master = master_template.render(
             set=crates["set"],
-            regex=crates["regex"],
             time=crates["time"],
             date=crates["datetime"],
             duration=crates["duration"],
+            helper_functions=helper_function,
             rule_functions=rule_functions,
             policy_functions=policy_functions,
             policyset_function=policyset_fn,
-            regex_claims=regex_claims,
             policy_name="",
             policyset_name=policyset_name,
             jwt=jwt,
-            jwt_field=jwt_field,
         )
 
     else:

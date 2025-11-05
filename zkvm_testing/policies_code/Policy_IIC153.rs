@@ -3,12 +3,6 @@ use iso8601_duration::Duration as IsoDuration;
 use policy_core::Inputs;
 use risc0_zkvm::guest::env;
 
-#[derive(Debug, PartialEq)]
-enum Result {
-    Permit,
-    Deny,
-    NotApplicable,
-}
 fn parse_time(raw: &str) -> DateTime<FixedOffset> {
     let input = format!("1970-01-01T{}", raw);
     DateTime::parse_from_rfc3339(&input).unwrap()
@@ -24,6 +18,13 @@ fn parse_duration(raw: &str) -> String {
     } else {
         parsed
     }
+}
+
+#[derive(Debug, PartialEq)]
+enum Result {
+    Permit,
+    Deny,
+    NotApplicable,
 }
 
 fn evaluate_cond_policy_rule(inp: &Inputs) -> bool {
@@ -43,7 +44,15 @@ fn evaluate_rule_policy_rule(inp: &Inputs) -> Result {
     }
 }
 
+fn evaluate_target_policy(inp: &Inputs) -> bool {
+    true
+}
+
 fn evaluate_policy_policy(inp: &Inputs) -> Result {
+    if !evaluate_target_policy(inp) {
+        return Result::NotApplicable;
+    }
+
     let results = vec![evaluate_rule_policy_rule(inp)];
 
     //deny-overrides

@@ -8,8 +8,8 @@ from datetime import datetime
 # Configuration
 base_dir = "policy_test_set"
 main_path = "main.py"
-log_file = "log.txt"
-failed_log_file = "failed.txt"
+log_file = r"logs\log.txt"
+failed_log_file = r"logs\failed.txt"
 lock_file = None
 # lock_file = "results.json"
 if lock_file is not None:
@@ -25,6 +25,9 @@ total = 0
 successes = 0
 failures = 0
 error_types = defaultdict(list)
+
+
+os.makedirs(os.path.dirname(log_file), exist_ok=True)
 
 # Logging setup
 def log(message):
@@ -79,7 +82,7 @@ for folder in os.listdir(base_dir):
 
     try:
         result = subprocess.run(
-            [sys.executable, main_path, policy_file, "-r", request_file, "-s", response_file, "-o", "zkvm_testing"],
+            [sys.executable, main_path, policy_file, "-r", request_file, "-s", response_file, "-o", "jwt_zkvm_testing", '-j'],
             capture_output=True,
             text=True,
             timeout=20

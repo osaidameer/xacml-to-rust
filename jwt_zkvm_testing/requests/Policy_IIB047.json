@@ -1,0 +1,5 @@
+{
+    "access_subject_subject_id": "Bart Simpson",
+    "resource_resource_id": "http://medico.com/record/patient/BartSimpson",
+    "action_action_id": "read"
+}

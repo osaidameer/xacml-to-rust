@@ -126,10 +126,11 @@ def generate_input_struct(xml_path: str, output_path: str):
     attributes = extract_inputs_from_policy(xml_path)
     crates = required_crates(xml_path)
     fields, params, assigns = generate_rust_struct(attributes)
-    #print(crates)
+    names = [attr["name"] for attr in attributes if "name" in attr]
+    #print(names)
+
     with open(os.path.join("templates", "input_template.jinja"), "r") as file:
         input_template = Template(file.read())
-
 
     input_rendered = input_template.render(
         time=crates["time"],
@@ -145,7 +146,7 @@ def generate_input_struct(xml_path: str, output_path: str):
         f.write(input_rendered)
 
     print(f"Rust Inputs struct generated in {output_path}")
-    return crates
+    return crates, names
     #"""
 
 # Optional standalone run

@@ -6,7 +6,7 @@
         Version="1.0">
 
     <Description>
-        Policy for Conformance Test IIC057 with JWT claim extraction (no outer AND).
+        Policy for Conformance Test IIC057 with JWT claim extraction.
     </Description>
 
     <Target>

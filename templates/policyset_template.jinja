@@ -88,7 +88,20 @@ fn evaluate_policyset_{{ policyset_name }}(inp: &Inputs) -> bool {
         //continues in the case of NotApplicable, condition not needed, adding comment for clarity
     }
     if counter == 1 {
-        return true;
+        //return true;
+        let results = vec![
+            {% for policy_id in policy_ids %}
+            evaluate_policy_{{ policy_id }}(inp),
+            {% endfor %}
+        ];
+        for res in &results {
+            if *res == Result::Deny {
+                return false
+            }
+            if *res == Result::Permit {
+                return true
+            }
+        }
     }
     return false;
     {% endif %}

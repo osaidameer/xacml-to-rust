@@ -1,0 +1,5 @@
+{
+    "jwt_field": [
+        "access_subject_key"
+    ]
+}

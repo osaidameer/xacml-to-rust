@@ -1,0 +1,8 @@
+{
+    "access_subject_subject_id": "Julius Hibbert",
+    "access_subject_age": 45,
+    "resource_resource_id": "http://medico.com/record/patient/BartSimpson",
+    "resource_author": "Julius Hibbert",
+    "action_action_id": "read",
+    "environment_bart_simpson_age": 10
+}

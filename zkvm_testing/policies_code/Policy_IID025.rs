@@ -46,7 +46,15 @@ fn evaluate_policy_policy1(inp: &Inputs) -> Result {
     return Result::NotApplicable;
 }
 
+fn evaluate_target_policy2(inp: &Inputs) -> bool {
+    true
+}
+
 fn evaluate_policy_policy2(inp: &Inputs) -> Result {
+    if !evaluate_target_policy2(inp) {
+        return Result::NotApplicable;
+    }
+
     let results = vec![evaluate_rule_policy2_rule2(inp)];
 
     //first-applicable
@@ -62,7 +70,7 @@ fn evaluate_policy_policy2(inp: &Inputs) -> Result {
 
 fn evaluate_policyset_policyset(inp: &Inputs) -> bool {
     //only-one-applicable
-    let results = vec![evaluate_target_policy1(inp)];
+    let results = vec![evaluate_target_policy1(inp), evaluate_target_policy2(inp)];
     let mut counter = 0;
     for res in &results {
         if *res == true {
@@ -74,7 +82,16 @@ fn evaluate_policyset_policyset(inp: &Inputs) -> bool {
         //continues in the case of NotApplicable, condition not needed, adding comment for clarity
     }
     if counter == 1 {
-        return true;
+        //return true;
+        let results = vec![evaluate_policy_policy1(inp), evaluate_policy_policy2(inp)];
+        for res in &results {
+            if *res == Result::Deny {
+                return false;
+            }
+            if *res == Result::Permit {
+                return true;
+            }
+        }
     }
     return false;
 }

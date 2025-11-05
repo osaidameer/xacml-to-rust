@@ -2,15 +2,16 @@ use chrono::{DateTime, FixedOffset, NaiveDate};
 use policy_core::Inputs;
 use risc0_zkvm::guest::env;
 
+fn parse_time(raw: &str) -> DateTime<FixedOffset> {
+    let input = format!("1970-01-01T{}", raw);
+    DateTime::parse_from_rfc3339(&input).unwrap()
+}
+
 #[derive(Debug, PartialEq)]
 enum Result {
     Permit,
     Deny,
     NotApplicable,
-}
-fn parse_time(raw: &str) -> DateTime<FixedOffset> {
-    let input = format!("1970-01-01T{}", raw);
-    DateTime::parse_from_rfc3339(&input).unwrap()
 }
 
 fn evaluate_cond_policy_rule(inp: &Inputs) -> bool {
@@ -29,7 +30,15 @@ fn evaluate_rule_policy_rule(inp: &Inputs) -> Result {
     }
 }
 
+fn evaluate_target_policy(inp: &Inputs) -> bool {
+    true
+}
+
 fn evaluate_policy_policy(inp: &Inputs) -> Result {
+    if !evaluate_target_policy(inp) {
+        return Result::NotApplicable;
+    }
+
     let results = vec![evaluate_rule_policy_rule(inp)];
 
     //deny-overrides

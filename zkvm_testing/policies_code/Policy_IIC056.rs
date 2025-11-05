@@ -1,7 +1,8 @@
 use policy_core::Inputs;
+use risc0_zkvm::guest::env;
+
 use regex_automata::dfa::{dense::DFA, Automaton};
 use regex_automata::Input;
-use risc0_zkvm::guest::env;
 
 fn eval_regex(regex_input: &str, regex_exp: &[u8]) -> bool {
     match DFA::from_bytes(regex_exp) {
@@ -16,11 +17,11 @@ fn eval_regex(regex_input: &str, regex_exp: &[u8]) -> bool {
     }
 }
 
-static RE_ED4C7C001BB380B1CA8A333D4E2D69A9: &[u8] =
-    include_bytes!("RE_ED4C7C001BB380B1CA8A333D4E2D69A9.bin");
+static RE_DB1E7DE8003A1D790F485A59FF0FD4AC: &[u8] =
+    include_bytes!("RE_DB1E7DE8003A1D790F485A59FF0FD4AC.bin");
 
-static RE_3FC2A4F9B76EEC7F4B2CF2413AF34EFA: &[u8] =
-    include_bytes!("RE_3FC2A4F9B76EEC7F4B2CF2413AF34EFA.bin");
+static RE_44CD3D81020D55D5FF8DD7897F251706: &[u8] =
+    include_bytes!("RE_44CD3D81020D55D5FF8DD7897F251706.bin");
 
 #[derive(Debug, PartialEq)]
 enum Result {
@@ -32,10 +33,10 @@ enum Result {
 fn evaluate_cond_policy_rule(inp: &Inputs) -> bool {
     (eval_regex(
         &inp.access_subject_subject_id,
-        &RE_ED4C7C001BB380B1CA8A333D4E2D69A9,
+        &RE_DB1E7DE8003A1D790F485A59FF0FD4AC,
     )) || (eval_regex(
         &inp.access_subject_subject_id,
-        &RE_3FC2A4F9B76EEC7F4B2CF2413AF34EFA,
+        &RE_44CD3D81020D55D5FF8DD7897F251706,
     ))
 }
 
@@ -47,7 +48,15 @@ fn evaluate_rule_policy_rule(inp: &Inputs) -> Result {
     }
 }
 
+fn evaluate_target_policy(inp: &Inputs) -> bool {
+    true
+}
+
 fn evaluate_policy_policy(inp: &Inputs) -> Result {
+    if !evaluate_target_policy(inp) {
+        return Result::NotApplicable;
+    }
+
     let results = vec![evaluate_rule_policy_rule(inp)];
 
     //deny-overrides
