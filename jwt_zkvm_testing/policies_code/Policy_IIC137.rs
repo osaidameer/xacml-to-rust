@@ -103,7 +103,7 @@ fn evaluate_policy_policy(inp: &Inputs) -> Result {
 fn main() {
     let inp: Inputs = env::read();
 
-    let decision = match evaluate_policy_policy(&inp) {
+    let mut decision = match evaluate_policy_policy(&inp) {
         Result::Permit => true,
         _ => false,
     };

@@ -12,26 +12,14 @@ use signature::Verifier;
 fn jwt_field_check(inp: &Inputs, extracted_values: &[String]) -> bool {
     for (i, field) in JWT_FIELD.iter().enumerate() {
         match *field {
-            "sub" => {
-                if extracted_values[i] != inp.access_subject_subject_id {
-                    return false;
-                }
-            }
             "role" => {
                 if extracted_values[i] != inp.access_subject_role {
-                    return false;
-                }
-            }
-            "age" => {
-                // Age might be numeric — convert if needed
-                if extracted_values[i] != inp.access_subject_age.to_string() {
                     return false;
                 }
             }
             _ => unreachable!("Unknown field — should be impossible due to codegen"),
         }
     }
-
     true
 }
 static MODULUS: &[u8] = include_bytes!("modulus.bin");
