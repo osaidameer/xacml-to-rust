@@ -27,9 +27,22 @@ fn jwt_field_check(inp: &Inputs, extracted_values: &[String]) -> bool {
         match *field {
         {%- for f in jwt_fields %}
             "{{ f }}" => {
-                if extracted_values[i] != inp.access_subject_{{ f }}{% if f == "age" %}.to_string(){% endif %} {
+                {%- if f == "sub" %}
+                if extracted_values[i] != inp.access_subject_subject_id {
                     return false;
                 }
+                {%- elif f == "role" %}
+                if extracted_values[i] != inp.access_subject_role {
+                    return false;
+                }
+                {%- elif f == "age" %}
+                if extracted_values[i] != inp.access_subject_age.to_string() {
+                    return false;
+                }
+                {%- else %}
+                // Unknown field — optional: compile error by using unreachable
+                unreachable!("Unknown field {{ f }}");
+                {%- endif %}
             },
         {%- endfor %}
             _ => unreachable!("Unknown field — should be impossible due to codegen"),

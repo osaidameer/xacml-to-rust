@@ -32,7 +32,7 @@ fn jwt_field_check(inp: &Inputs, extracted_values: &[String]) -> bool {
     for (i, field) in JWT_FIELD.iter().enumerate() {
         match *field {
             "sub" => {
-                if extracted_values[i] != inp.access_subject_sub {
+                if extracted_values[i] != inp.access_subject_subject_id {
                     return false;
                 }
             }
