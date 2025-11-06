@@ -36,7 +36,7 @@ fn jwt_field_check(inp: &Inputs, extracted_values: &[String]) -> bool {
                     return false;
                 }
                 {%- elif f == "age" %}
-                if extracted_values[i].parse().unwrap() != inp.access_subject_age {
+                if extracted_values[i].parse() != Ok(inp.access_subject_age) {
                     return false;
                 }
                 {%- else %}

@@ -13,7 +13,7 @@ fn jwt_field_check(inp: &Inputs, extracted_values: &[String]) -> bool {
     for (i, field) in JWT_FIELD.iter().enumerate() {
         match *field {
             "age" => {
-                if extracted_values[i].parse().unwrap() != inp.access_subject_age {
+                if extracted_values[i].parse() != Ok(inp.access_subject_age) {
                     return false;
                 }
             }
@@ -151,7 +151,7 @@ fn evaluate_policy_policy(inp: &Inputs) -> Result {
 fn main() {
     let inp: Inputs = env::read();
 
-    decision = match evaluate_policy_policy(&inp) {
+    let mut decision = match evaluate_policy_policy(&inp) {
         Result::Permit => true,
         _ => false,
     };
