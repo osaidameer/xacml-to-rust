@@ -40,7 +40,7 @@ fn main() {
     let inp: Inputs = env::read();
 
     {% if policyset_function %}
-    let decision = evaluate_policyset_{{ policyset_name }}(&inp);
+    let mut decision = evaluate_policyset_{{ policyset_name }}(&inp);
     {% else %}
     let mut decision = match evaluate_policy_{{ policy_name }}(&inp) {
         Result::Permit => true,

@@ -196,7 +196,7 @@ fn evaluate_policyset_policyset(inp: &Inputs) -> bool {
 fn main() {
     let inp: Inputs = env::read();
 
-    let decision = evaluate_policyset_policyset(&inp);
+    let mut decision = evaluate_policyset_policyset(&inp);
 
     let jwt: String = env::read();
     let jwt_positions: Vec<usize> = env::read();
