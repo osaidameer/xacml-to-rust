@@ -11,8 +11,9 @@ use signature::Verifier;
 
 static MODULUS: &[u8] = include_bytes!("modulus.bin");
 static EXPONENT: &[u8] = include_bytes!("exponent.bin");
+const JWT_FIELD: &[&str] = &[];
 
-fn verify_jwt(token: &str) {
+fn extract_jwt(token: &str, positions: &Vec<usize>, inp: &Inputs) -> bool {
     let mut parts = token.split('.');
     let header_b64 = parts.next().expect("jwt header");
     let payload_b64 = parts.next().expect("jwt payload");
@@ -38,6 +39,10 @@ fn verify_jwt(token: &str) {
     verifying_key
         .verify(signed_data.as_bytes(), &signature)
         .expect("RSA signature check");
+
+    let payload_str = String::from_utf8(payload).expect("payload utf8");
+
+    return true;
 }
 
 #[derive(Debug, PartialEq)]
@@ -87,13 +92,18 @@ fn evaluate_policy_policy(inp: &Inputs) -> Result {
 
 fn main() {
     let inp: Inputs = env::read();
-    let jwt: String = env::read();
-    verify_jwt(&jwt);
 
     let decision = match evaluate_policy_policy(&inp) {
         Result::Permit => true,
         _ => false,
     };
 
+    let jwt: String = env::read();
+    let jwt_positions: Vec<usize> = env::read();
+    if !extract_jwt(&jwt, &jwt_positions, &inp) {
+        decision = false;
+    }
+
     env::commit(&decision);
+    env::commit(&inp);
 }

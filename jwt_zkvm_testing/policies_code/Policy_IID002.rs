@@ -9,10 +9,36 @@ use rsa::{
 use sha2::Sha256;
 use signature::Verifier;
 
+fn jwt_field_check(inp: &Inputs, extracted_values: &[String]) -> bool {
+    for (i, field) in JWT_FIELD.iter().enumerate() {
+        match *field {
+            "sub" => {
+                if extracted_values[i] != inp.access_subject_subject_id {
+                    return false;
+                }
+            }
+            "role" => {
+                if extracted_values[i] != inp.access_subject_role {
+                    return false;
+                }
+            }
+            "age" => {
+                // Age might be numeric — convert if needed
+                if extracted_values[i] != inp.access_subject_age.to_string() {
+                    return false;
+                }
+            }
+            _ => unreachable!("Unknown field — should be impossible due to codegen"),
+        }
+    }
+
+    true
+}
 static MODULUS: &[u8] = include_bytes!("modulus.bin");
 static EXPONENT: &[u8] = include_bytes!("exponent.bin");
+const JWT_FIELD: &[&str] = &["sub", "age"];
 
-fn verify_jwt(token: &str) {
+fn extract_jwt(token: &str, positions: &Vec<usize>, inp: &Inputs) -> bool {
     let mut parts = token.split('.');
     let header_b64 = parts.next().expect("jwt header");
     let payload_b64 = parts.next().expect("jwt payload");
@@ -38,6 +64,49 @@ fn verify_jwt(token: &str) {
     verifying_key
         .verify(signed_data.as_bytes(), &signature)
         .expect("RSA signature check");
+
+    let payload_str = String::from_utf8(payload).expect("payload utf8");
+
+    // Verify quote positions and extract values
+    let mut extracted_values = Vec::new();
+    for (i, key) in JWT_FIELD.iter().enumerate() {
+        let key_start = positions[i * 4];
+        let key_end = positions[i * 4 + 1];
+        let value_start = positions[i * 4 + 2];
+        let value_end = positions[i * 4 + 3];
+
+        // Verify the positions correspond to the expected key-value pair
+        let key_part = &payload_str[key_start..=key_end];
+        let expected_key = format!("\"{}\"", key);
+        assert_eq!(key_part, expected_key, "Key position verification failed");
+
+        // Verify the separator between key and value (should only contain spaces and colon)
+        let separator = &payload_str[key_end + 1..value_start];
+        assert!(
+            separator.chars().all(|c| c == ' ' || c == ':'),
+            "Separator should only contain spaces and colon"
+        );
+        let colon_count = separator.chars().filter(|&c| c == ':').count();
+        assert_eq!(colon_count, 1, "Separator must contain exactly one colon");
+
+        // Verify value quotes are correct
+        assert_eq!(
+            &payload_str[value_start..value_start + 1],
+            "\"",
+            "Value should start with quote"
+        );
+        assert_eq!(
+            &payload_str[value_end..value_end + 1],
+            "\"",
+            "Value should end with quote"
+        );
+
+        // Extract the value (without quotes)
+        let value = &payload_str[value_start + 1..value_end];
+        extracted_values.push(value.to_string());
+    }
+
+    return jwt_field_check(&inp, &extracted_values);
 }
 
 #[derive(Debug, PartialEq)]
@@ -128,13 +197,18 @@ fn evaluate_policy_policy(inp: &Inputs) -> Result {
 
 fn main() {
     let inp: Inputs = env::read();
-    let jwt: String = env::read();
-    verify_jwt(&jwt);
 
     let decision = match evaluate_policy_policy(&inp) {
         Result::Permit => true,
         _ => false,
     };
 
+    let jwt: String = env::read();
+    let jwt_positions: Vec<usize> = env::read();
+    if !extract_jwt(&jwt, &jwt_positions, &inp) {
+        decision = false;
+    }
+
     env::commit(&decision);
+    env::commit(&inp);
 }

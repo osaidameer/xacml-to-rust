@@ -124,10 +124,14 @@ def required_crates(xml_file):
 def generate_input_struct(xml_path: str, output_path: str):
     """Generate Rust Inputs struct from an XACML policy file."""
     attributes = extract_inputs_from_policy(xml_path)
+
+    fields_with_datatypes = {}
+    for attr in attributes:
+        fields_with_datatypes[attr["name"]] = rust_type(attr['data_type'], attr['is_vector'])
+
     crates = required_crates(xml_path)
     fields, params, assigns = generate_rust_struct(attributes)
-    names = [attr["name"] for attr in attributes if "name" in attr]
-    #print(names)
+    #print(fields_with_datatypes)
 
     with open(os.path.join("templates", "input_template.jinja"), "r") as file:
         input_template = Template(file.read())
@@ -146,7 +150,7 @@ def generate_input_struct(xml_path: str, output_path: str):
         f.write(input_rendered)
 
     print(f"Rust Inputs struct generated in {output_path}")
-    return crates, names
+    return crates, fields_with_datatypes
     #"""
 
 # Optional standalone run

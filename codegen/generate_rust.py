@@ -20,6 +20,11 @@ parse_funcs = {
     "yearMonthDuration": "parse_duration",
     "dayTimeDuration": "parse_duration",
 }
+field_to_jwt_mapping = {
+    "access_subject_subject_id": "sub",
+    "access_subject_role": "role",
+    "access_subject_age": "age"
+}
 
 # Load external templates
 def load_template(filename):
@@ -260,15 +265,22 @@ def render_policy(policy, output_dir):
             f.write(v)
     return policy_id, rule_functions, policy_fn, regex_claim
 
-def generate_policy_code(ir, output_dir: str, output_file: str, crates, jwt=False, fields=None):
-    if fields is None:
-        fields = []
+def generate_policy_code(ir, output_dir: str, output_file: str, crates, fields, jwt=False):
     output_path = os.path.join(output_dir, output_file)
     rule_functions = []
     policy_functions = []
     policy_ids = []
     regex_claims = []
     #jwt_fields = ', '.join(f'"{f}"' for f in fields)
+    jwt_fields = []
+
+    for field_name, data_type in fields.items():
+        if (field_name.lower() == "access_subject_subject_id" or field_name.lower() == "access_subject_role" ) and data_type.lower() == "string":
+            jwt_fields.append(field_to_jwt_mapping[field_name])
+        if field_name.lower() == "access_subject_age" and data_type in {"f64", "i32"}:
+            jwt_fields.append(field_to_jwt_mapping[field_name])
+
+    # print(jwt_fields)
 
     if ir["type"] == "Policy":
         policy_id, rule_functions, policy_fn, regex_claim = render_policy(ir, output_dir)
@@ -277,7 +289,7 @@ def generate_policy_code(ir, output_dir: str, output_file: str, crates, jwt=Fals
             regex=crates["regex"],
             regex_claims=regex_claim,
             jwt=jwt,
-            #jwt_fields=jwt_fields,
+            jwt_fields=jwt_fields,
             time=crates["time"],
             duration=crates["duration"],
         )
@@ -321,7 +333,7 @@ def generate_policy_code(ir, output_dir: str, output_file: str, crates, jwt=Fals
             regex=crates["regex"],
             regex_claims=regex_claims,
             jwt=jwt,
-            #jwt_fields=jwt_fields,
+            jwt_fields=jwt_fields,
             time=crates["time"],
             duration=crates["duration"],
         )

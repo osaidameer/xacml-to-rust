@@ -39,11 +39,6 @@ enum Result {
 fn main() {
     let inp: Inputs = env::read();
 
-    {%- if jwt %}
-    let jwt: String = env::read();
-    verify_jwt(&jwt);
-    {% endif %}
-
     {% if policyset_function %}
     let decision = evaluate_policyset_{{ policyset_name }}(&inp);
     {% else %}
@@ -53,5 +48,14 @@ fn main() {
     };
     {% endif %}
 
+    {%- if jwt %}
+    let jwt: String = env::read();
+    let jwt_positions: Vec<usize> = env::read();
+    if !extract_jwt(&jwt, &jwt_positions, &inp) {
+        decision = false;
+    }
+    {% endif %}
+
     env::commit(&decision);
+    env::commit(&inp);
 }

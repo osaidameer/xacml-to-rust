@@ -1,6 +1,0 @@
-{
-    "jwt_field": [
-        "access_subject_subject_id",
-        "access_subject_age"
-    ]
-}

@@ -20,14 +20,14 @@ def main():
     basename = os.path.splitext(os.path.basename(args.policy))[0]
     ir = parse_xacml_simple(args.policy)
     crates, fields = generate_input_struct(args.policy, output_path=os.path.join(output_dir, "input_definition", f"{basename}.rs"))
-    generate_policy_code(ir, output_dir=os.path.join(output_dir, "policies_code"), output_file=f"{basename}.rs", crates=crates, jwt=args.jwt, fields=fields)
+    generate_policy_code(ir, output_dir=os.path.join(output_dir, "policies_code"), output_file=f"{basename}.rs", crates=crates, fields=fields, jwt=args.jwt)
 
     if args.request:
         generate_request_json(request_file=args.request, output_path=os.path.join(output_dir, "requests" ,f"{basename}.json"))
     if args.response:
         generate_response_json(response_file=args.response, output_path=os.path.join(output_dir, "responses" ,f"{basename}.json"))
-    if args.jwt:
-        generate_jwt_fields_json(jwt_fields=fields, output_path=os.path.join(output_dir, "jwt_fields" ,f"{basename}.json"))
+    #if args.jwt:
+    #    generate_jwt_fields_json(jwt_fields=fields, output_path=os.path.join(output_dir, "jwt_fields" ,f"{basename}.json"))
 
 if __name__ == "__main__":
     main()
