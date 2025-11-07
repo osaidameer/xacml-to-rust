@@ -3,7 +3,7 @@ from codegen.generate_rust import generate_policy_code
 import json
 from codegen.input_generator import generate_input_struct
 from fuzzing.fuzzer import main as fuzz_main
-from fuzzing.merger import main as merge_main
+from fuzzing.merger import main as merge_main, batch_main as merge_batch_main
 from fuzzing.config import TEMP_JSON_PATH
 import os
 
@@ -27,6 +27,8 @@ def arg_adding(parser: argparse.ArgumentParser):
         "--merge-level", type=int, default=1, help="merge level (default: 1)"
     )
 
+    parser.add_argument("--merge-batch", type=int, default=400)
+
     parser.add_argument(
         "--fuzzing-temp-json-path",
         "--merge-temp-json-path",
@@ -38,7 +40,7 @@ def arg_adding(parser: argparse.ArgumentParser):
 
 
 def arg_routing(args: argparse.Namespace):
-    if not (args.fuzzing or args.merge):
+    if not (args.fuzzing or args.merge or args.merge_batch):
         return 0
     basename = os.path.splitext(os.path.basename(args.policy))[0]
     output_dir = args.output or "output"
@@ -62,13 +64,22 @@ def arg_routing(args: argparse.Namespace):
                 output_file=f"{basename}_fuzz_{i}.rs",
                 crates=crates,
             )
-    else:
+    elif args.merge:
         merge_main(
             basename.removeprefix("Policy_"),
             args.fuzzing_temp_json_path,
             output_dir,
             args.merge_level,
         )
+    elif args.merge_batch:
+        merge_batch_main(
+            args.fuzzing_temp_json_path,
+            output_dir,
+            args.merge_level,
+            args.merge_batch,
+        )
+    else:
+        return 0
 
     print(
         f"Mutated policies JSON are saved to {args.fuzzing_temp_json_path or TEMP_JSON_PATH}"

@@ -13,15 +13,23 @@ import json
 import random
 import os
 from pathlib import Path
+from glob import glob
+import csv
+import hashlib
+
+try:
+    from tqdm import tqdm
+except ImportError:
+    tqdm = lambda x: x
 
 from ir.simple_ir import parse_xacml_simple
 
 OPS = ["OR", "AND"]
 
 
-def collect_policy():
+def collect_policy() -> list[str]:
     with open(TEST_SET_PATH / ".." / "results.json", "r") as f:
-        results = json.load(f)
+        results: dict = json.load(f)
     return [a for a in results.keys() if results[a][0] == "Passed"]
 
 
@@ -37,17 +45,123 @@ def parse_resp(path):
     return parse_xacml_response(content)
 
 
+def get_ast_depth(ast: dict) -> int:
+    if "children" not in ast or not ast["children"]:
+        return 1
+    return 1 + max(get_ast_depth(child) for child in ast["children"])
+
+
+def get_ast_size(ast: dict) -> int:
+    if "children" not in ast or not ast["children"]:
+        return 1
+    return 1 + sum(get_ast_size(child) for child in ast["children"])
+
+
+def get_ast_depth_size(ast: dict) -> tuple[int, int]:
+    if "children" not in ast or not ast["children"]:
+        return (1, 1)
+
+    depths = []
+    total_size = 1
+
+    for child in ast["children"]:
+        child_depth, child_size = get_ast_depth_size(child)
+        depths.append(child_depth)
+        total_size += child_size
+
+    return (1 + max(depths), total_size)
+
+
+def batch_main(
+    new_temp_json_path: str,
+    output_dir: str,
+    merge_level: int = 1,
+    batch_size: int = 400,
+):
+    policies = collect_policy()
+    picked_policies = policies[:]
+    random.shuffle(picked_policies)
+
+    print(f"Generate {batch_size} merged policies in batch mode")
+    for i in tqdm(range(batch_size)):
+        policy_name = (
+            picked_policies.pop().removeprefix("Policy_").removesuffix(".xml.rs")
+        )
+        if main(
+            policy_name,
+            new_temp_json_path,
+            output_dir,
+            merge_level,
+            policies=policies[:],
+        ):
+            # print(f"Failed to merge policy {policy_name} in batch mode")
+            i -= 1
+            continue
+    
+    print("Generating summary CSV file...")
+    # policy name, input file full name, response file full name, policy full name, depth, size
+    rows = [
+        [
+            "policy_name",
+            "input_file",
+            "response_file",
+            "policy_file",
+            "ast_depth",
+            "ast_size",
+            "input_file_sha256",
+            "response_file_sha256",
+            "policy_file_sha256",
+        ]
+    ]
+    for f in glob(str((TEMP_JSON_PATH / f"*_level{merge_level}.json"))):
+        with open(f, "r") as fp:
+            policy = json.load(fp)
+        depth, size = get_ast_depth_size(policy["rules"][0]["condition"])
+        policy_name = (
+            Path(f)
+            .stem.removeprefix("Policy_")
+            .removesuffix(f"_merged_level{merge_level}")
+        )
+        item = [
+            policy_name,
+            f"Policy_{policy_name}_merged_level{merge_level}_inputs.json",
+            f"Policy_{policy_name}_merged_level{merge_level}_response.json",
+            f,
+            depth,
+            size,
+        ]
+        for file_path in item[1:4]:
+            with open(TEMP_JSON_PATH / file_path, "rb") as file_to_hash:
+                file_data = file_to_hash.read()
+                file_hash = hashlib.sha256(file_data).hexdigest()
+                item.append(file_hash)
+        rows.append(item)
+    with open(
+        TEMP_JSON_PATH / f"merged_level{merge_level}_summary.csv", "w", newline=""
+    ) as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows(rows)
+
+
 def main(
-    policy_name: str, new_temp_json_path: str, output_dir: str, merge_level: int = 1
+    policy_name: str,
+    new_temp_json_path: str,
+    output_dir: str,
+    merge_level: int = 1,
+    policies: list[str] = None,
 ):
     global TEMP_JSON_PATH
     if new_temp_json_path != "":
         TEMP_JSON_PATH = Path(new_temp_json_path)
     os.makedirs(TEMP_JSON_PATH, exist_ok=True)
-    policies = collect_policy()
+    if policies is None:
+        policies = collect_policy()
     policy = parse_xacml_simple(
         TEST_SET_PATH / policy_name / f"Policy_{policy_name}.xml"
     )
+    if len(policy["rules"]) != 1 or policy["rules"][0]["condition"] is None:
+        print(f"Cannot merge policy {policy_name} without condition")
+        return 1
     policy_inputs = parse_req(
         TEST_SET_PATH / policy_name / f"Request_{policy_name}.xml"
     )
@@ -133,6 +247,7 @@ def main(
     ) as f:
         json.dump(policy_response, f, indent=2)
     output_dir = Path(output_dir) / "merged_policies_code"
+    print(policy)
     generate_policy_code(
         policy,
         output_dir=output_dir,
