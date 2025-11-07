@@ -27,7 +27,13 @@ def arg_adding(parser: argparse.ArgumentParser):
         "--merge-level", type=int, default=1, help="merge level (default: 1)"
     )
 
-    parser.add_argument("--merge-batch", type=int, default=400)
+    parser.add_argument(
+        "--merge-batch",
+        type=int,
+        default=400,
+        required=False,
+        help="merge policies in batch mode with specified batch size",
+    )
 
     parser.add_argument(
         "--fuzzing-temp-json-path",

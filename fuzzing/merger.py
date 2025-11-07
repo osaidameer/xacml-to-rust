@@ -16,11 +16,19 @@ from pathlib import Path
 from glob import glob
 import csv
 import hashlib
+import logging
+import shutil
+
+LOGGER = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 try:
     from tqdm import tqdm
+
+    HAS_TQDM = True
 except ImportError:
     tqdm = lambda x: x
+    HAS_TQDM = False
 
 from ir.simple_ir import parse_xacml_simple
 
@@ -82,38 +90,53 @@ def batch_main(
     picked_policies = policies[:]
     random.shuffle(picked_policies)
 
-    print(f"Generate {batch_size} merged policies in batch mode")
-    for i in tqdm(range(batch_size)):
+    LOGGER.info(
+        f"Generate {batch_size} merged policies in batch mode, from total {len(policies)} available policies"
+    )
+    if HAS_TQDM:
+        pbar = tqdm(total=batch_size)
+    i = 0
+    while i < batch_size:
+        if len(picked_policies) == 0:
+            LOGGER.critical("Ran out of policies to merge")
+            break
         policy_name = (
             picked_policies.pop().removeprefix("Policy_").removesuffix(".xml.rs")
         )
-        if main(
-            policy_name,
-            new_temp_json_path,
-            output_dir,
-            merge_level,
-            policies=policies[:],
+        if (
+            main(
+                policy_name,
+                new_temp_json_path,
+                output_dir,
+                merge_level,
+                policies=policies[:],
+            )
+            == 0
         ):
-            # print(f"Failed to merge policy {policy_name} in batch mode")
-            i -= 1
-            continue
-    
-    print("Generating summary CSV file...")
+            i += 1
+            if HAS_TQDM:
+                pbar.update(1)
+    if HAS_TQDM:
+        pbar.close()
+
+    LOGGER.info("Generating summary CSV file...")
     # policy name, input file full name, response file full name, policy full name, depth, size
     rows = [
         [
-            "policy_name",
+            "base_policy_name",
             "input_file",
             "response_file",
             "policy_file",
+            "rust_file",
             "ast_depth",
             "ast_size",
             "input_file_sha256",
             "response_file_sha256",
             "policy_file_sha256",
+            "rust_file_sha256",
         ]
     ]
-    for f in glob(str((TEMP_JSON_PATH / f"*_level{merge_level}.json"))):
+    for f in tqdm(glob(str((TEMP_JSON_PATH / f"*_level{merge_level}.json")))):
         with open(f, "r") as fp:
             policy = json.load(fp)
         depth, size = get_ast_depth_size(policy["rules"][0]["condition"])
@@ -122,25 +145,34 @@ def batch_main(
             .stem.removeprefix("Policy_")
             .removesuffix(f"_merged_level{merge_level}")
         )
+        shutil.copyfile(
+            Path(output_dir)
+            / "merged_policies_code"
+            / f"Policy_{policy_name}_merged_level{merge_level}.rs",
+            TEMP_JSON_PATH / f"Policy_{policy_name}_merged_level{merge_level}.rs",
+        )
         item = [
             policy_name,
             f"Policy_{policy_name}_merged_level{merge_level}_inputs.json",
             f"Policy_{policy_name}_merged_level{merge_level}_response.json",
-            f,
+            Path(f).name,
+            f"Policy_{policy_name}_merged_level{merge_level}.rs",
             depth,
             size,
         ]
-        for file_path in item[1:4]:
+        for file_path in item[1:5]:
             with open(TEMP_JSON_PATH / file_path, "rb") as file_to_hash:
                 file_data = file_to_hash.read()
                 file_hash = hashlib.sha256(file_data).hexdigest()
                 item.append(file_hash)
         rows.append(item)
+
     with open(
         TEMP_JSON_PATH / f"merged_level{merge_level}_summary.csv", "w", newline=""
     ) as csvfile:
         writer = csv.writer(csvfile)
         writer.writerows(rows)
+    LOGGER.info(f"Summary CSV file generated, row count: {len(rows) - 1}")
 
 
 def main(
@@ -160,7 +192,7 @@ def main(
         TEST_SET_PATH / policy_name / f"Policy_{policy_name}.xml"
     )
     if len(policy["rules"]) != 1 or policy["rules"][0]["condition"] is None:
-        print(f"Cannot merge policy {policy_name} without condition")
+        LOGGER.warning(f"Cannot merge policy {policy_name} without condition")
         return 1
     policy_inputs = parse_req(
         TEST_SET_PATH / policy_name / f"Request_{policy_name}.xml"
@@ -174,7 +206,9 @@ def main(
     lvl = 0
     # remove dup
     if f"Policy_{policy_name}.xml.rs" not in policies:
-        print("Warning: current policy not in result.json(it doesn't pass test)")
+        LOGGER.warning(
+            "Warning: current policy not in result.json(it doesn't pass test)"
+        )
     policies.remove(f"Policy_{policy_name}.xml.rs")
     while lvl < merge_level and len(policies) > 0:
         new_policy = random.choice(policies)
@@ -203,7 +237,7 @@ def main(
             or len(new_policy["rules"]) != 1
             or new_policy["rules"][0]["condition"] == None
         ):
-            print(
+            LOGGER.debug(
                 f"Skip merging {new_policy_path} due to input conflict with current policy"
             )
             continue
@@ -226,10 +260,10 @@ def main(
                 policy_response["decision"] or new_policy_resp["decision"]
             )
         policy_crates.update(new_policy_crates)
-        print(f"Merged {new_policy_path} into current policy with {top_op}")
+        LOGGER.debug(f"Merged {new_policy_path} into current policy with {top_op}")
         lvl += 1
     if lvl != merge_level:
-        print(
+        LOGGER.warning(
             f"WARNING: Only merged {lvl} times, less than requested {merge_level} times. Possibly due to input conflicts."
         )
     with open(
@@ -247,10 +281,10 @@ def main(
     ) as f:
         json.dump(policy_response, f, indent=2)
     output_dir = Path(output_dir) / "merged_policies_code"
-    print(policy)
     generate_policy_code(
         policy,
         output_dir=output_dir,
         output_file=f"Policy_{policy_name}_merged_level{lvl}.rs",
         crates=policy_crates,
     )
+    return 0
