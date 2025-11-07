@@ -13,7 +13,7 @@ fn jwt_field_check(inp: &Inputs, extracted_values: &[String]) -> bool {
     for (i, field) in JWT_FIELD.iter().enumerate() {
         match *field {
             "age" => {
-                if extracted_values[i] != inp.access_subject_age.to_string() {
+                if extracted_values[i].parse() != Ok(inp.access_subject_age) {
                     return false;
                 }
             }
@@ -56,6 +56,12 @@ fn extract_jwt(token: &str, positions: &Vec<usize>, inp: &Inputs) -> bool {
     let payload_str = String::from_utf8(payload).expect("payload utf8");
 
     // Verify quote positions and extract values
+
+    // this is the case where a policy expects a subject, role, or age field, but the request was missing the required field
+    if positions.is_empty() {
+        return true;
+    }
+
     let mut extracted_values = Vec::new();
     for (i, key) in JWT_FIELD.iter().enumerate() {
         let key_start = positions[i * 4];
