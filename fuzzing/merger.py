@@ -53,18 +53,6 @@ def parse_resp(path):
     return parse_xacml_response(content)
 
 
-def get_ast_depth(ast: dict) -> int:
-    if "children" not in ast or not ast["children"]:
-        return 1
-    return 1 + max(get_ast_depth(child) for child in ast["children"])
-
-
-def get_ast_size(ast: dict) -> int:
-    if "children" not in ast or not ast["children"]:
-        return 1
-    return 1 + sum(get_ast_size(child) for child in ast["children"])
-
-
 def get_ast_depth_size(ast: dict) -> tuple[int, int]:
     if "children" not in ast or not ast["children"]:
         return (1, 1)
@@ -77,7 +65,8 @@ def get_ast_depth_size(ast: dict) -> tuple[int, int]:
         depths.append(child_depth)
         total_size += child_size
 
-    return (1 + max(depths), total_size)
+    max_depth = max(depths) if depths else 0
+    return (1 + max_depth, total_size)
 
 
 def batch_main(
