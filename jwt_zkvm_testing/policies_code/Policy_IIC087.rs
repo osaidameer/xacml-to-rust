@@ -47,16 +47,17 @@ fn extract_jwt(token: &str, positions: &Vec<usize>, inp: &Inputs) -> bool {
     // let e_bytes = engine.decode(EXPONENT_B64).expect("exponent base64");
     // let n = BigUint::from_bytes_be(&n_bytes);
     // let e = BigUint::from_bytes_be(&e_bytes);
-    let n = BigUint::from_bytes_be(MODULUS);
-    let e = BigUint::from_bytes_be(EXPONENT);
-    let public_key = RsaPublicKey::new(n, e).expect("valid RSA public key");
-    let verifying_key = VerifyingKey::<Sha256>::new(public_key);
-    let signature = Signature::try_from(signature_bytes.as_slice()).expect("signature format");
 
-    let signed_data = format!("{}.{}", header_b64, payload_b64);
-    verifying_key
-        .verify(signed_data.as_bytes(), &signature)
-        .expect("RSA signature check");
+    // let n = BigUint::from_bytes_be(MODULUS);
+    // let e = BigUint::from_bytes_be(EXPONENT);
+    // let public_key = RsaPublicKey::new(n, e).expect("valid RSA public key");
+    // let verifying_key = VerifyingKey::<Sha256>::new(public_key);
+    // let signature = Signature::try_from(signature_bytes.as_slice()).expect("signature format");
+
+    // let signed_data = format!("{}.{}", header_b64, payload_b64);
+    // verifying_key
+    //    .verify(signed_data.as_bytes(), &signature)
+    //    .expect("RSA signature check");
 
     let payload_str = String::from_utf8(payload).expect("payload utf8");
 

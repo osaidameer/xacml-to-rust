@@ -21,11 +21,12 @@ else:
 
 
 # Tracking
-total = 0
+total = 0            # attempted runs (subprocess executed)
 successes = 0
-failures = 0
-error_types = defaultdict(list)
+failures = 0         # runs attempted but failed
+skips = 0            # skipped without attempting run
 
+error_types = defaultdict(list)
 
 os.makedirs(os.path.dirname(log_file), exist_ok=True)
 
@@ -46,13 +47,14 @@ if locked is not None:
 log(f"\n=== Run started at {datetime.now()} ===")
 
 for folder in os.listdir(base_dir):
-    if folder.startswith("III"):
+    if folder.startswith("III"):  # Ignore some folder naming pattern
         print(f"Ignoring {folder}")
         continue
+
     folder_path = os.path.join(base_dir, folder)
 
     if not os.path.isdir(folder_path):
-        failures += 1
+        skips += 1
         error_types["Skipped"].append(folder)
         message = f"[SKIP] {folder}: Not a directory."
         log(message)
@@ -64,19 +66,22 @@ for folder in os.listdir(base_dir):
     response_file = os.path.join(folder_path, f"Response_{folder}.xml")
 
     if not os.path.exists(policy_file) or not os.path.exists(request_file) or not os.path.exists(response_file):
-        failures += 1
+        skips += 1
         error_types["Skipped"].append(folder)
-        message = f"[SKIP] {folder}: Policy file not found."
+        message = f"[SKIP] {folder}: Policy/Request/Response file missing."
         log(message)
         log_failure(message)
         continue
 
+    # At this point we are going to attempt running subprocess
     total += 1
+
     if locked is not None:
-        output_name = f"Policy_{folder}.xml.rs" 
+        output_name = f"Policy_{folder}.xml.rs"
         if output_name in locked and locked[output_name][0] == 'Passed':
             log(f"[INFO] Processing {policy_file}")
         else:
+            skips += 1
             log(f"[SKIP] {policy_file} not in lock file or marked as failed, skip")
             continue
 
@@ -116,9 +121,10 @@ for folder in os.listdir(base_dir):
 
 # Summary
 log("\n=== SUMMARY ===")
-log(f"Total processed (attempted runs): {total}")
+log(f"Total attempted runs:            {total}")
 log(f"Successful:                      {successes}")
-log(f"Failed (including skips):        {failures}")
+log(f"Failed:                          {failures}")
+log(f"Skipped (not attempted):         {skips}")
 
 log("\n--- Error Types ---")
 for err_type, folders in error_types.items():
