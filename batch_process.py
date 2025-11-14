@@ -5,13 +5,13 @@ import traceback
 from collections import defaultdict
 from datetime import datetime
 
-# Configuration
 base_dir = "policy_test_set"
 main_path = "main.py"
-log_file = r"logs\log.txt"
-failed_log_file = r"logs\failed.txt"
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+log_file = f"logs\\log_{timestamp}.txt"
+failed_log_file = f"logs\\failed_{timestamp}.txt"
 lock_file = None
-# lock_file = "results.json"
+
 if lock_file is not None:
     import json
     with open(lock_file, 'r') as f:
@@ -21,10 +21,10 @@ else:
 
 
 # Tracking
-total = 0            # attempted runs (subprocess executed)
+total = 0
 successes = 0
-failures = 0         # runs attempted but failed
-skips = 0            # skipped without attempting run
+failures = 0
+skips = 0
 
 error_types = defaultdict(list)
 
@@ -46,8 +46,12 @@ if locked is not None:
 # Start log
 log(f"\n=== Run started at {datetime.now()} ===")
 
+import time
+
+timings = {}
+
 for folder in os.listdir(base_dir):
-    if folder.startswith("III"):  # Ignore some folder naming pattern
+    if folder.startswith("III"):
         print(f"Ignoring {folder}")
         continue
 
@@ -73,7 +77,6 @@ for folder in os.listdir(base_dir):
         log_failure(message)
         continue
 
-    # At this point we are going to attempt running subprocess
     total += 1
 
     if locked is not None:
@@ -86,16 +89,21 @@ for folder in os.listdir(base_dir):
             continue
 
     try:
+        start_time = time.perf_counter()
         result = subprocess.run(
+            #[sys.executable, main_path, policy_file, "-o", "jwt_zkvm_testing",'-j'],
             [sys.executable, main_path, policy_file, "-r", request_file, "-s", response_file, "-o", "jwt_zkvm_testing", '-j'],
             capture_output=True,
             text=True,
             timeout=20
         )
+        end_time = time.perf_counter()
+        elapsed_time = end_time - start_time
 
         if result.returncode == 0:
             successes += 1
-            log(f"[SUCCESS] {folder}")
+            timings[folder] = elapsed_time
+            log(f"[SUCCESS] {folder} - Time: {elapsed_time:.2f}s")
         else:
             failures += 1
             error_type = f"RuntimeError_{result.returncode}"
@@ -118,6 +126,15 @@ for folder in os.listdir(base_dir):
         message = f"[EXCEPTION] {folder}: {exc_type}\n{traceback.format_exc()}"
         log(message)
         log_failure(message)
+
+if timings:
+    avg_time = sum(timings.values()) / len(timings)
+    print(f"\nAverage execution time for successful runs: {avg_time:.2f}s")
+
+    with open("execution_timings.txt", "w") as f:
+        for folder, t in timings.items():
+            f.write(f"{folder}: {t:.2f}s\n")
+        f.write(f"\nAverage: {avg_time:.2f}s\n")
 
 # Summary
 log("\n=== SUMMARY ===")

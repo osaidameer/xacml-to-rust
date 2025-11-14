@@ -61,20 +61,6 @@ This module takes the intermediate representation (IR) as input and generates Ru
    python3 main.py [-h] [-r REQUEST] [-s RESPONSE] [-o OUTPUT] policy
    ```
 
-## Limitations
-- Currently missing date duration, bag, set, string manipulation, and type conversion functions (DONE)
-- Missing rfc800Name, x500path as data types
-- Does not currently support nested PolicySets
-- Limited support for custom XACML functions
 
-## Currently supported crates
-- chrono: for date, datetime, time
-- iso8601_duration
-- regex
 
-## TODO
-- Design testing pipeline to run all test cases from collected dataset
-  - Define input format from request.xml in dataset (DONE: decided on json)
-- Handle case where attribute is not present in request, based on decided input format (DONE: fields now implement default values)
-- Add string manipulation functionality. Clean up rust_expr function and merge after completion (DONE)
 

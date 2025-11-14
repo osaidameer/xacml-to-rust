@@ -153,28 +153,6 @@ def generate_input_struct(xml_path: str, output_path: str):
     return crates, fields_with_datatypes
     #"""
 
-# Optional standalone run
 if __name__ == "__main__":
-    """
-    input_xml = "../policies/example_input.xml"
-    output_file = f"inputs_{os.path.basename(input_xml).replace('.xml', '.rs')}"
-    generate_input_struct(input_xml, output_file)
-    """
-    base_dir = r"C:\Users\Osaid\Desktop\ZKZT\core-develop\pdp-testutils\src\test\resources\conformance\xacml-3.0-from-2.0-ct\mandatory"
-    # Loop through IIC120 to IIC163
-    for i in range(0, 164):
-        if i != 8:
-            continue
-        key = f"IIB00{i}"
-        folder = os.path.join(base_dir, key)
-        filename = f"Policy_{key}.xml"
-        file_path = os.path.join(folder, filename)
+    pass
 
-        if os.path.exists(file_path):
-            print(f"Processing {key}...")
-            attributes = extract_inputs_from_policy(file_path)
-            rust_code = generate_rust_struct(attributes)
-            generate_input_struct(file_path, "")
-            print(rust_code)
-        else:
-            print(f"⚠️ File not found: {file_path}")

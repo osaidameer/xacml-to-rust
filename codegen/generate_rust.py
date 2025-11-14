@@ -1,5 +1,3 @@
-from operator import truediv
-
 from jinja2 import Template
 from codegen.input_generator import rustify_name
 import subprocess

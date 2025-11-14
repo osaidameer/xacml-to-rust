@@ -2,9 +2,6 @@ from lxml import etree
 from typing import Dict, List, Union, Optional
 import json
 
-"""
-Standard comparison and arithmetic functions. Currently type conversion functions, high-order bag functions
-"""
 comparisons = {
     "greater-than-or-equal": ">=",
     "greater-than": ">",
@@ -341,35 +338,3 @@ if __name__ == "__main__":
     ir = parse_xacml_simple("../test_policy.xml")
     print(json.dumps(ir, indent=2))
     print("IR generated successfully!")
-    """
-    import os
-    base_dir = "../policy_test_set"
-
-    # Output file to store all IRs
-    output_file = "all_ir.json"
-    all_irs = {}
-
-    # Loop through IIC120 to IIC163
-    for i in range(311, 312):
-        key = f"IIF{i}"
-        folder = os.path.join(base_dir, key)
-        filename = f"Policy_{key}.xml"
-        file_path = os.path.join(folder, filename)
-
-        if os.path.exists(file_path):
-            print(f"Processing {key}...")
-            try:
-                ir = parse_xacml_simple(file_path)
-                print(json.dumps(ir, indent=2))
-                all_irs[key] = ir
-            except Exception as e:
-                print(f"❌ Failed to parse {key}: {e}")
-        else:
-            print(f"⚠️ File not found: {file_path}")
-
-    # Write everything to one JSON file
-    with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(all_irs, f, indent=2)
-
-    print(f"\n All IRs written to {output_file}")
-    """

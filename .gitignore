@@ -1,24 +1,12 @@
 # .gitignore
-log.txt
-failed.txt
-ir/all_ir.json
-misc.py
+logs/
 output/
-policies/
-original_policy_requests/
-test_output/
 input_test.py
 .gitignore
-rust_struct_fields.json
-field_frequencies.json
 zkvm_testing/
-flake.*
-test_policy.xml
-test_request.xml
 generate_jwt.py
 jwt_key
 public_key.pem
-no_string_fields
 
 # Python
 __pycache__/
@@ -28,9 +16,8 @@ __pycache__/
 env/
 *.egg-info/
 
-# VSCode or PyCharm
+
 .idea/
-.vscode/
 
 # Nixos Dev
 .envrc
