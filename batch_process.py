@@ -5,20 +5,27 @@ import traceback
 from collections import defaultdict
 from datetime import datetime
 
+# --- Global Configuration ---
+USE_REQUEST_RESPONSE_FILES = False
+OUTPUT_FOLDER_NAME = "output"
+USE_JWT_FLAG = False
+# ----------------------------
+
+
 base_dir = "policy_test_set"
 main_path = "main.py"
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 log_file = f"logs\\log_{timestamp}.txt"
 failed_log_file = f"logs\\failed_{timestamp}.txt"
-lock_file = None
 
+
+lock_file = None
 if lock_file is not None:
     import json
     with open(lock_file, 'r') as f:
         locked = json.load(f)
 else:
     locked = None
-
 
 # Tracking
 total = 0
@@ -90,13 +97,31 @@ for folder in os.listdir(base_dir):
 
     try:
         start_time = time.perf_counter()
+
+        base_command = [sys.executable, main_path, policy_file]
+
+        if USE_REQUEST_RESPONSE_FILES:
+            command = base_command + [
+                "-r", request_file,
+                "-s", response_file
+            ]
+        else:
+            command = base_command
+
+        command.extend(["-o", OUTPUT_FOLDER_NAME])
+
+        if USE_JWT_FLAG:
+            command.append("-j")
+
+        # log(f"[INFO] Running command: {' '.join(str(c) for c in command)}")
+
         result = subprocess.run(
-            #[sys.executable, main_path, policy_file, "-o", "jwt_zkvm_testing",'-j'],
-            [sys.executable, main_path, policy_file, "-r", request_file, "-s", response_file, "-o", "jwt_zkvm_testing", '-j'],
+            command,
             capture_output=True,
             text=True,
             timeout=20
         )
+
         end_time = time.perf_counter()
         elapsed_time = end_time - start_time
 
@@ -146,3 +171,6 @@ log(f"Skipped (not attempted):         {skips}")
 log("\n--- Error Types ---")
 for err_type, folders in error_types.items():
     log(f"{err_type} ({len(folders)}): {', '.join(folders)}")
+
+
+
