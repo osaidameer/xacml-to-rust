@@ -6,9 +6,9 @@ from collections import defaultdict
 from datetime import datetime
 
 # --- Global Configuration ---
-USE_REQUEST_RESPONSE_FILES = False
-OUTPUT_FOLDER_NAME = "output"
-USE_JWT_FLAG = False
+USE_REQUEST_RESPONSE_FILES = True
+OUTPUT_FOLDER_NAME = "jwt_zkvm_testing"
+USE_JWT_FLAG = True
 # ----------------------------
 
 
