@@ -5,7 +5,7 @@ from codegen.generate_request_response_json import (
 from codegen.generate_rust import generate_policy_code
 from codegen.input_generator import (
     extract_inputs_from_policy,
-    generate_input_struct,
+    generate_rust_struct,
     required_crates,
 )
 from fuzzing.config import TEMP_JSON_PATH, TEST_SET_PATH
@@ -18,9 +18,9 @@ import csv
 import hashlib
 import logging
 import shutil
+from jinja2 import Template
 
 LOGGER = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 try:
     from tqdm import tqdm
@@ -164,6 +164,51 @@ def batch_main(
     LOGGER.info(f"Summary CSV file generated, row count: {len(rows) - 1}")
 
 
+def get_inp_struct_and_crates(
+    policy_name: str,
+) -> tuple[list[str], dict]:
+    p = TEST_SET_PATH / policy_name / f"Policy_{policy_name}.xml"
+    attributes = extract_inputs_from_policy(p)
+    crates = required_crates(p)
+    return (attributes, crates)
+
+
+def update_inp(
+    base_inp: tuple[list[str], dict],
+    new_inp: tuple[list[str], dict],
+) -> tuple[list[str], dict]:
+    base_struct, base_crates = base_inp
+    new_struct, new_crates = new_inp
+    for k in base_crates.keys():
+        base_crates[k] = base_crates[k] or new_crates[k]
+    base_struct.extend(new_struct)
+    return (base_struct, base_crates)
+
+
+def generate_inp(
+    inp: tuple[list[str], dict],
+    output_path: str,
+):
+    crates = inp[1]
+    fields, params, assigns = generate_rust_struct(inp[0])
+
+    with open(os.path.join("templates", "input_template.jinja"), "r") as file:
+        input_template = Template(file.read())
+
+    input_rendered = input_template.render(
+        time=crates["time"],
+        date=crates["datetime"],
+        duration=crates["duration"],
+        fields=fields,
+        params=params,
+        assigns=assigns,
+    )
+    with open(output_path, "w") as f:
+        f.write(input_rendered)
+
+    print(f"Rust Inputs struct generated in {output_path}")
+
+
 def main(
     policy_name: str,
     new_temp_json_path: str,
@@ -199,24 +244,34 @@ def main(
             "Warning: current policy not in result.json(it doesn't pass test)"
         )
     policies.remove(f"Policy_{policy_name}.xml.rs")
+    base_inp = get_inp_struct_and_crates(policy_name)
     while lvl < merge_level and len(policies) > 0:
         new_policy = random.choice(policies)
         # remove dup
         policies.remove(new_policy)
-        new_policy = new_policy.removeprefix("Policy_").removesuffix(".xml.rs")
-        new_policy_path = TEST_SET_PATH / new_policy
-        new_policy_policy = new_policy_path / f"Policy_{new_policy}.xml"
-        new_policy_request = new_policy_path / f"Request_{new_policy}.xml"
-        new_policy_response = new_policy_path / f"Response_{new_policy}.xml"
+        new_policy_name = new_policy.removeprefix("Policy_").removesuffix(".xml.rs")
+        new_policy_path = TEST_SET_PATH / new_policy_name
+        new_policy_policy = new_policy_path / f"Policy_{new_policy_name}.xml"
+        new_policy_request = new_policy_path / f"Request_{new_policy_name}.xml"
+        new_policy_response = new_policy_path / f"Response_{new_policy_name}.xml"
         new_policy = parse_xacml_simple(new_policy_policy)
         new_policy_inp = parse_req(new_policy_request)
         new_policy_resp = parse_resp(new_policy_response)
         new_policy_crates = required_crates(new_policy_policy)
 
+        new_inp = get_inp_struct_and_crates(new_policy_name)
+
         inp_conflict = False
-        for k, v in policy_inputs.items():
-            for k2, v2 in new_policy_inp.items():
-                if k == k2 and v != v2:
+        for t in base_inp[0]:
+            name, type_, is_vector = t.values()
+            for t2 in new_inp[0]:
+                name2, type2, is_vector2 = t2.values()
+                # if there are same name but different value, type or is_vector -> conflict
+                if name == name2 and (
+                    policy_inputs.get(name) != new_policy_inp.get(name2)
+                    or type_ != type2
+                    or is_vector != is_vector2
+                ):
                     inp_conflict = True
                     break
             if inp_conflict:
@@ -249,7 +304,11 @@ def main(
                 policy_response["decision"] or new_policy_resp["decision"]
             )
         policy_crates.update(new_policy_crates)
+        LOGGER.debug(f"Current input struct: {base_inp}")
+        LOGGER.debug(f"New input struct to merge: {new_inp}")
         LOGGER.debug(f"Merged {new_policy_path} into current policy with {top_op}")
+        base_inp = update_inp(base_inp, new_inp)
+        LOGGER.debug(f"Updated input struct: {base_inp}")
         lvl += 1
     if lvl != merge_level:
         LOGGER.warning(
@@ -275,5 +334,9 @@ def main(
         output_dir=output_dir,
         output_file=f"Policy_{policy_name}_merged_level{lvl}.rs",
         crates=policy_crates,
+    )
+    generate_inp(
+        base_inp,
+        output_dir / f"Policy_{policy_name}_merged_level{lvl}_inputs.rs",
     )
     return 0
