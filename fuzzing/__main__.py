@@ -6,6 +6,7 @@ from fuzzing.fuzzer import main as fuzz_main
 from fuzzing.merger import main as merge_main, batch_main as merge_batch_main
 from fuzzing.config import TEMP_JSON_PATH
 import os
+import logging
 
 
 def arg_adding(parser: argparse.ArgumentParser):
@@ -42,6 +43,10 @@ def arg_adding(parser: argparse.ArgumentParser):
         default="",
         help="temporary path to save mutated policies (default: empty)",
     )
+
+    parser.add_argument(
+        "--verbose", "-v", action="count", default=1, help="increase verbosity level"
+    )
     return parser
 
 
@@ -50,6 +55,13 @@ def arg_routing(args: argparse.Namespace):
         return 0
     basename = os.path.splitext(os.path.basename(args.policy))[0]
     output_dir = args.output or "output"
+
+    if args.verbose == 0:
+        logging.basicConfig(level=logging.INFO)
+    elif args.verbose >= 2:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.WARNING)
 
     if args.fuzzing:
         crates = generate_input_struct(
@@ -103,7 +115,4 @@ if __name__ == "__main__":
     parser.add_argument("--temp-json-path", type=str, required=False, default="")
 
     args = parser.parse_args()
-    for p, j in fuzz_main(args.file, args.rounds, args.temp_json_path, args.collect_op):
-        with open(p, "w") as f:
-            json.dump(j, f, indent=2)
     print(f"Mutated policies are saved to {TEMP_JSON_PATH}")
