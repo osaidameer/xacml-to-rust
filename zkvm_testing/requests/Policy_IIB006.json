@@ -1,0 +1,5 @@
+{
+    "access_subject_subject_id": "Julius Hibbert",
+    "resource_resource_id": "http://medico.com/record/patient/BartSimpson",
+    "action_action_id": "urn:oasis:names:tc:xacml:1.0:action:implied-action"
+}

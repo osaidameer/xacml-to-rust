@@ -36,6 +36,10 @@ def extract_inputs_from_policy(xml_file):
         attr_id = elem.get("AttributeId", "").strip()
         attr_cat = elem.get("Category", "").strip()
         data_type = elem.get("DataType", "").strip()
+        from_jwt = elem.get("FromJWT", "").strip()
+
+        if from_jwt:
+            continue
 
         if attr_id and data_type:
             name = f"{rustify_name(attr_cat)}_{rustify_name(attr_id)}"
@@ -120,12 +124,17 @@ def required_crates(xml_file):
 def generate_input_struct(xml_path: str, output_path: str):
     """Generate Rust Inputs struct from an XACML policy file."""
     attributes = extract_inputs_from_policy(xml_path)
+
+    fields_with_datatypes = {}
+    for attr in attributes:
+        fields_with_datatypes[attr["name"]] = rust_type(attr['data_type'], attr['is_vector'])
+
     crates = required_crates(xml_path)
     fields, params, assigns = generate_rust_struct(attributes)
-    #print(crates)
+    #print(fields_with_datatypes)
+
     with open(os.path.join("templates", "input_template.jinja"), "r") as file:
         input_template = Template(file.read())
-
 
     input_rendered = input_template.render(
         time=crates["time"],
@@ -141,31 +150,9 @@ def generate_input_struct(xml_path: str, output_path: str):
         f.write(input_rendered)
 
     print(f"Rust Inputs struct generated in {output_path}")
-    return crates
+    return crates, fields_with_datatypes
     #"""
 
-# Optional standalone run
 if __name__ == "__main__":
-    """
-    input_xml = "../policies/example_input.xml"
-    output_file = f"inputs_{os.path.basename(input_xml).replace('.xml', '.rs')}"
-    generate_input_struct(input_xml, output_file)
-    """
-    base_dir = r"C:\Users\Osaid\Desktop\ZKZT\core-develop\pdp-testutils\src\test\resources\conformance\xacml-3.0-from-2.0-ct\mandatory"
-    # Loop through IIC120 to IIC163
-    for i in range(0, 164):
-        if i != 8:
-            continue
-        key = f"IIB00{i}"
-        folder = os.path.join(base_dir, key)
-        filename = f"Policy_{key}.xml"
-        file_path = os.path.join(folder, filename)
+    pass
 
-        if os.path.exists(file_path):
-            print(f"Processing {key}...")
-            attributes = extract_inputs_from_policy(file_path)
-            rust_code = generate_rust_struct(attributes)
-            generate_input_struct(file_path, "")
-            print(rust_code)
-        else:
-            print(f"⚠️ File not found: {file_path}")

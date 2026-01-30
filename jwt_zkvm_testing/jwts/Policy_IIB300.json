@@ -1,0 +1,6 @@
+{
+  "jwt_fields": [
+    "role"
+  ],
+  "jwt": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwcmV6dGEiLCJyb2xlIjoiZG9jdG9yIn0.zbxq_X0Z-vdBBCLnFr6W0-YMzr77d7HAiJ50S7Bby7mj5eo058MmGNm7aIbk4_S9CNxwByn8TerOwGQQDp6Y6J1Otp6izc42PpyvpFYi3YVhHeFfXyo29O5qzWjLxnuRDYr_oz1q_ngbrjmoRgEpT0TU_9orW0W_aJIpgB8RQr2iiVyZzeEVYyjIwdJLS1QitZD44d9_0A0nGXmkubXKkdcJLfYa7bTBBKrxksXZ5ck8z9sVpshIcmxmEdCBp94INVUJKxVrTJmynjwRWHg5Ek8kCAObXbyHBIrLNWHfZDBL1QYpNI10MfnmcbiApAsDISKvqPXi-sw81AxHOsRELw"
+}

@@ -1,0 +1,6 @@
+{
+  "jwt_fields": [
+    "age"
+  ],
+  "jwt": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwcmV6dGEiLCJhZ2UiOiItaW5mIn0.Hx8DhoUNJjihKsYpNh3FnmdXGmRBYYuAQ-PHsk8XkkbWZm-mivvjh0XXMsNKMaSBA_obhLlg4olkU3C_QveqT_7_uXr7OtwuWsBA29tg3LLNRudURAe9WhboC9RtHZULFnbySPqV69siao_SEZOm_iqR4w2aZT3MtGUsBI-Atidrmt279M7y_nZ1Z2fwjEuJToVy_PUdn5qCdlUADzSclKhw8jau9-hdBjyKFEvI7vDX8CKnfku5ip_XzRh5f6oItP_UJDy2WYEmvysJ4sry1s7I5015uZmCSf2dKJGFtzHQKlTAUmGr4S5oJHskFJt6qa94p0nN63syhO9-1NI68g"
+}

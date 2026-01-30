@@ -1,0 +1,71 @@
+{
+    "access_subject_subject_id": [
+        "Julius Hibbert as string",
+        "test string",
+        "Julius Hibbert"
+    ],
+    "access_subject_subject_boolean": [
+        true,
+        false
+    ],
+    "access_subject_subject_integer": [
+        56,
+        12
+    ],
+    "access_subject_subject_double": [
+        27.5,
+        73985.34256
+    ],
+    "access_subject_subject_date": [
+        "2002-03-22",
+        "1256-11-11"
+    ],
+    "access_subject_subject_dateTime": [
+        "2002-03-22T08:23:47-05:00",
+        "1056-11-05T19:08:12-14:00"
+    ],
+    "access_subject_subject_dayTimeDuration": [
+        "P50DT5H4M3S",
+        "P12DT148H18M21S"
+    ],
+    "access_subject_subject_yearMonthDuration": [
+        "-P5Y3M",
+        "-P28Y7M"
+    ],
+    "access_subject_subject_hexBinary": [
+        "0BF7A9876CDE",
+        "0FB8"
+    ],
+    "access_subject_subject_base64Binary": [
+        "c3VyZS4=",
+        "YXN1cmUu"
+    ],
+    "access_subject_subject_rfc822Name": [
+        "j_hibbert@MEDICO.COM",
+        "c_clown@NOSE.MEDICO.COM"
+    ],
+    "access_subject_subject_x500Name": [
+        "cn=Julius Hibbert, o=Medi Corporation, c=US",
+        "cn=Crusty Clown, o=Red Nose Corporation, c=US"
+    ],
+    "access_subject_subject_ipAddress": [
+        "122.45.38.245/255.255.255.64:8080",
+        "35.123.111.56/255.64.32.255:9999"
+    ],
+    "access_subject_subject_dnsName": [
+        "some.host.name:147-874",
+        "a.different.host:-45"
+    ],
+    "resource_resource_id": [
+        "http://medico.com/record/patient/BartSimpson",
+        "http://medico.com/record/patient/HomerSimpson"
+    ],
+    "action_action_id": [
+        "read",
+        "write"
+    ],
+    "environment_current_time": [
+        "08:23:47-05:00",
+        "22:12:10-14:00"
+    ]
+}

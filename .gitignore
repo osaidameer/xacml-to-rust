@@ -1,12 +1,13 @@
 # .gitignore
-log.txt
-failed.txt
-ir/all_ir.json
-misc.py
+logs/
 output/
-policies/
-original_policy_requests/
-test_output/
+input_test.py
+.gitignore
+zkvm_testing/
+generate_jwt.py
+jwt_key
+public_key.pem
+execution_timings.txt
 
 # Python
 __pycache__/
@@ -16,9 +17,8 @@ __pycache__/
 env/
 *.egg-info/
 
-# VSCode or PyCharm
+
 .idea/
-.vscode/
 
 # Nixos Dev
 .envrc

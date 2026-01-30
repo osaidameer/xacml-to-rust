@@ -1,0 +1,16 @@
+
+use chrono::{NaiveDate, DateTime, FixedOffset};
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[serde(default)]
+pub struct Inputs {
+    pub environment_current_dateTime: Vec<DateTime<FixedOffset>>,
+}
+
+impl Inputs {
+    pub fn new(environment_current_dateTime: Vec<DateTime<FixedOffset>>) -> Self {
+        Self {
+            environment_current_dateTime,
+        }
+    }
+}

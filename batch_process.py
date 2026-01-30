@@ -5,13 +5,21 @@ import traceback
 from collections import defaultdict
 from datetime import datetime
 
-# Configuration
+# --- Global Configuration ---
+USE_REQUEST_RESPONSE_FILES = True
+OUTPUT_FOLDER_NAME = "jwt_zkvm_testing"
+USE_JWT_FLAG = True
+# ----------------------------
+
+
 base_dir = "policy_test_set"
 main_path = "main.py"
-log_file = "log.txt"
-failed_log_file = "failed.txt"
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+log_file = f"logs\\log_{timestamp}.txt"
+failed_log_file = f"logs\\failed_{timestamp}.txt"
+
+
 lock_file = None
-# lock_file = "results.json"
 if lock_file is not None:
     import json
     with open(lock_file, 'r') as f:
@@ -19,12 +27,15 @@ if lock_file is not None:
 else:
     locked = None
 
-
 # Tracking
 total = 0
 successes = 0
 failures = 0
+skips = 0
+
 error_types = defaultdict(list)
+
+os.makedirs(os.path.dirname(log_file), exist_ok=True)
 
 # Logging setup
 def log(message):
@@ -42,14 +53,19 @@ if locked is not None:
 # Start log
 log(f"\n=== Run started at {datetime.now()} ===")
 
+import time
+
+timings = {}
+
 for folder in os.listdir(base_dir):
     if folder.startswith("III"):
         print(f"Ignoring {folder}")
         continue
+
     folder_path = os.path.join(base_dir, folder)
 
     if not os.path.isdir(folder_path):
-        failures += 1
+        skips += 1
         error_types["Skipped"].append(folder)
         message = f"[SKIP] {folder}: Not a directory."
         log(message)
@@ -57,34 +73,62 @@ for folder in os.listdir(base_dir):
         continue
 
     policy_file = os.path.join(folder_path, f"Policy_{folder}.xml")
-    if not os.path.exists(policy_file):
-        failures += 1
+    request_file = os.path.join(folder_path, f"Request_{folder}.xml")
+    response_file = os.path.join(folder_path, f"Response_{folder}.xml")
+
+    if not os.path.exists(policy_file) or not os.path.exists(request_file) or not os.path.exists(response_file):
+        skips += 1
         error_types["Skipped"].append(folder)
-        message = f"[SKIP] {folder}: Policy file not found."
+        message = f"[SKIP] {folder}: Policy/Request/Response file missing."
         log(message)
         log_failure(message)
         continue
 
     total += 1
+
     if locked is not None:
-        output_name = f"Policy_{folder}.xml.rs" 
+        output_name = f"Policy_{folder}.xml.rs"
         if output_name in locked and locked[output_name][0] == 'Passed':
             log(f"[INFO] Processing {policy_file}")
         else:
+            skips += 1
             log(f"[SKIP] {policy_file} not in lock file or marked as failed, skip")
             continue
 
     try:
+        start_time = time.perf_counter()
+
+        base_command = [sys.executable, main_path, policy_file]
+
+        if USE_REQUEST_RESPONSE_FILES:
+            command = base_command + [
+                "-r", request_file,
+                "-s", response_file
+            ]
+        else:
+            command = base_command
+
+        command.extend(["-o", OUTPUT_FOLDER_NAME])
+
+        if USE_JWT_FLAG:
+            command.append("-j")
+
+        # log(f"[INFO] Running command: {' '.join(str(c) for c in command)}")
+
         result = subprocess.run(
-            [sys.executable, main_path, policy_file],
+            command,
             capture_output=True,
             text=True,
             timeout=20
         )
 
+        end_time = time.perf_counter()
+        elapsed_time = end_time - start_time
+
         if result.returncode == 0:
             successes += 1
-            log(f"[SUCCESS] {folder}")
+            timings[folder] = elapsed_time
+            log(f"[SUCCESS] {folder} - Time: {elapsed_time:.2f}s")
         else:
             failures += 1
             error_type = f"RuntimeError_{result.returncode}"
@@ -108,12 +152,25 @@ for folder in os.listdir(base_dir):
         log(message)
         log_failure(message)
 
+if timings:
+    avg_time = sum(timings.values()) / len(timings)
+    print(f"\nAverage execution time for successful runs: {avg_time:.2f}s")
+
+    with open("execution_timings.txt", "w") as f:
+        for folder, t in timings.items():
+            f.write(f"{folder}: {t:.2f}s\n")
+        f.write(f"\nAverage: {avg_time:.2f}s\n")
+
 # Summary
 log("\n=== SUMMARY ===")
-log(f"Total processed (attempted runs): {total}")
+log(f"Total attempted runs:            {total}")
 log(f"Successful:                      {successes}")
-log(f"Failed (including skips):        {failures}")
+log(f"Failed:                          {failures}")
+log(f"Skipped (not attempted):         {skips}")
 
 log("\n--- Error Types ---")
 for err_type, folders in error_types.items():
     log(f"{err_type} ({len(folders)}): {', '.join(folders)}")
+
+
+

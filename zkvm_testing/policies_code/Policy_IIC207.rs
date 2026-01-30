@@ -1,0 +1,66 @@
+use policy_core::Inputs;
+use risc0_zkvm::guest::env;
+use std::collections::HashSet;
+
+#[derive(Debug, PartialEq)]
+enum Result {
+    Permit,
+    Deny,
+    NotApplicable,
+}
+
+fn evaluate_cond_policy_rule(inp: &Inputs) -> bool {
+    (vec![
+        &"urn:oasis:names:tc:xacml:1.0:resource:resource-id".to_string(),
+        &"http://medico.com/record/patient/BartSimpson".to_string(),
+    ])
+    .into_iter()
+    .collect::<HashSet<_>>()
+    .is_disjoint(&inp.access_subject_test_attr.iter().collect::<HashSet<_>>())
+        == false
+}
+
+fn evaluate_rule_policy_rule(inp: &Inputs) -> Result {
+    if evaluate_cond_policy_rule(inp) {
+        return Result::Permit;
+    } else {
+        return Result::NotApplicable;
+    }
+}
+
+fn evaluate_target_policy(inp: &Inputs) -> bool {
+    true
+}
+
+fn evaluate_policy_policy(inp: &Inputs) -> Result {
+    if !evaluate_target_policy(inp) {
+        return Result::NotApplicable;
+    }
+
+    let results = vec![evaluate_rule_policy_rule(inp)];
+
+    //deny-overrides
+    let mut atleast_one_permit = false;
+    for res in &results {
+        if *res == Result::Deny {
+            return Result::Deny;
+        } else if *res == Result::Permit {
+            atleast_one_permit = true;
+        }
+    }
+    if atleast_one_permit {
+        return Result::Permit;
+    }
+    return Result::NotApplicable;
+}
+
+fn main() {
+    let inp: Inputs = env::read();
+
+    let decision = match evaluate_policy_policy(&inp) {
+        Result::Permit => true,
+        _ => false,
+    };
+
+    env::commit(&decision);
+}

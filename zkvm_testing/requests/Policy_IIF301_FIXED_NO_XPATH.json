@@ -1,0 +1,10 @@
+{
+    "access_subject_subject_id": "Julius Hibbert",
+    "access_subject_test_attr": [
+        "   This  is IT!  ",
+        "   This  is IT!  "
+    ],
+    "PersonalInfo_resource_id": "http://medico.com/record/patient/BartSimpson",
+    "action_action_id": "read",
+    "OurTown_theHospitalWebSite": "http://medico.com/ABC_Hospital"
+}
