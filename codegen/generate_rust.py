@@ -197,7 +197,7 @@ def rust_operand(op, for_regex=False):
         return f"{field_name}"
 
     elif op["type"] == "value":
-        string_types = {"string", "anyURI", "rfc822Name", "hexBinary", "base64Binary"}
+        string_types = {"string", "anyURI", "rfc822Name", "hexBinary", "base64Binary", "x500Name"}
         date_types = {"date", "dateTime"}
         duration_types = {"yearMonthDuration", "dayTimeDuration"}
         data_type = op["data_type"]
