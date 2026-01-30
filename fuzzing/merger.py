@@ -7,6 +7,7 @@ from codegen.input_generator import (
     extract_inputs_from_policy,
     generate_rust_struct,
     required_crates,
+    rust_type,
 )
 from fuzzing.config import TEMP_JSON_PATH, TEST_SET_PATH
 import json
@@ -38,7 +39,11 @@ OPS = ["OR", "AND"]
 def collect_policy() -> list[str]:
     with open(TEST_SET_PATH / ".." / "results.json", "r") as f:
         results: dict = json.load(f)
-    return [a for a in results.keys() if results[a][0] == "Passed"]
+    return [
+        a
+        for a in results.keys()
+        if not isinstance(results[a], list) or results[a][0] != "Passed"
+    ]
 
 
 def parse_req(path):
@@ -89,9 +94,7 @@ def batch_main(
         if len(picked_policies) == 0:
             LOGGER.critical("Ran out of policies to merge")
             break
-        policy_name = (
-            picked_policies.pop().removeprefix("Policy_").removesuffix(".xml.rs")
-        )
+        policy_name = picked_policies.pop().removeprefix("Policy_").removesuffix(".rs")
         if (
             main(
                 policy_name,
@@ -239,17 +242,17 @@ def main(
     )
     lvl = 0
     # remove dup
-    if f"Policy_{policy_name}.xml.rs" not in policies:
+    if f"Policy_{policy_name}.rs" not in policies:
         LOGGER.warning(
             "Warning: current policy not in result.json(it doesn't pass test)"
         )
-    policies.remove(f"Policy_{policy_name}.xml.rs")
+    policies.remove(f"Policy_{policy_name}.rs")
     base_inp = get_inp_struct_and_crates(policy_name)
     while lvl < merge_level and len(policies) > 0:
         new_policy = random.choice(policies)
         # remove dup
         policies.remove(new_policy)
-        new_policy_name = new_policy.removeprefix("Policy_").removesuffix(".xml.rs")
+        new_policy_name = new_policy.removeprefix("Policy_").removesuffix(".rs")
         new_policy_path = TEST_SET_PATH / new_policy_name
         new_policy_policy = new_policy_path / f"Policy_{new_policy_name}.xml"
         new_policy_request = new_policy_path / f"Request_{new_policy_name}.xml"
@@ -329,11 +332,17 @@ def main(
     ) as f:
         json.dump(policy_response, f, indent=2)
     output_dir = Path(output_dir) / "merged_policies_code"
+    fields_with_datatypes = {}
+    for attr in base_inp[0]:
+        fields_with_datatypes[attr["name"]] = rust_type(
+            attr["data_type"], attr["is_vector"]
+        )
     generate_policy_code(
         policy,
         output_dir=output_dir,
         output_file=f"Policy_{policy_name}_merged_level{lvl}.rs",
         crates=policy_crates,
+        fields=fields_with_datatypes,
     )
     generate_inp(
         base_inp,

@@ -31,7 +31,7 @@ def arg_adding(parser: argparse.ArgumentParser):
     parser.add_argument(
         "--merge-batch",
         type=int,
-        default=400,
+        default=0,
         required=False,
         help="merge policies in batch mode with specified batch size",
     )
