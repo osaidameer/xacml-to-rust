@@ -50,8 +50,7 @@ fn main() {
 
     {%- if jwt %}
     let jwt: String = env::read();
-    let jwt_positions: Vec<usize> = env::read();
-    if !extract_jwt(&jwt, &jwt_positions, &inp) {
+    if !extract_jwt(&jwt, &inp) {
         decision = false;
     }
     {% endif %}

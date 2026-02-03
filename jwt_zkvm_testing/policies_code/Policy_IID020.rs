@@ -9,16 +9,29 @@ use rsa::{
 use sha2::Sha256;
 use signature::Verifier;
 
-fn jwt_field_check(inp: &Inputs, extracted_values: &[String]) -> bool {
-    for (i, field) in JWT_FIELD.iter().enumerate() {
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize)]
+struct JwtPayload {
+    sub: Option<String>,
+    role: Option<String>,
+    age: Option<String>,
+}
+
+fn jwt_field_check(inp: &Inputs, jwt: &JwtPayload) -> bool {
+    for field in JWT_FIELD.iter() {
         match *field {
             "sub" => {
-                if extracted_values[i] != inp.access_subject_subject_id {
+                if jwt.sub != Some(inp.access_subject_subject_id) {
                     return false;
                 }
             }
             "age" => {
-                if extracted_values[i].parse() != Ok(inp.access_subject_age) {
+                if let Some(age_str) = &jwt.age {
+                    if age_str.parse() != Ok(inp.access_subject_age) {
+                        return false;
+                    }
+                } else {
                     return false;
                 }
             }
@@ -31,7 +44,7 @@ static MODULUS: &[u8] = include_bytes!("modulus.bin");
 static EXPONENT: &[u8] = include_bytes!("exponent.bin");
 const JWT_FIELD: &[&str] = &["sub", "age"];
 
-fn extract_jwt(token: &str, positions: &Vec<usize>, inp: &Inputs) -> bool {
+fn extract_jwt(token: &str, inp: &Inputs) -> bool {
     let mut parts = token.split('.');
     let header_b64 = parts.next().expect("jwt header");
     let payload_b64 = parts.next().expect("jwt payload");
@@ -64,49 +77,12 @@ fn extract_jwt(token: &str, positions: &Vec<usize>, inp: &Inputs) -> bool {
     // Verify quote positions and extract values
 
     // this is the case where a policy expects a subject, role, or age field, but the request was missing the required field
-    if positions.is_empty() {
-        return true;
-    }
+    //if positions.is_empty() {
+    //    return true;
+    //}
+    let jwt_struct: JwtPayload = serde_json::from_str(&payload_str).expect("invalid JWT JSON");
 
-    let mut extracted_values = Vec::new();
-    for (i, key) in JWT_FIELD.iter().enumerate() {
-        let key_start = positions[i * 4];
-        let key_end = positions[i * 4 + 1];
-        let value_start = positions[i * 4 + 2];
-        let value_end = positions[i * 4 + 3];
-
-        // Verify the positions correspond to the expected key-value pair
-        let key_part = &payload_str[key_start..=key_end];
-        let expected_key = format!("\"{}\"", key);
-        assert_eq!(key_part, expected_key, "Key position verification failed");
-
-        // Verify the separator between key and value (should only contain spaces and colon)
-        let separator = &payload_str[key_end + 1..value_start];
-        assert!(
-            separator.chars().all(|c| c == ' ' || c == ':'),
-            "Separator should only contain spaces and colon"
-        );
-        let colon_count = separator.chars().filter(|&c| c == ':').count();
-        assert_eq!(colon_count, 1, "Separator must contain exactly one colon");
-
-        // Verify value quotes are correct
-        assert_eq!(
-            &payload_str[value_start..value_start + 1],
-            "\"",
-            "Value should start with quote"
-        );
-        assert_eq!(
-            &payload_str[value_end..value_end + 1],
-            "\"",
-            "Value should end with quote"
-        );
-
-        // Extract the value (without quotes)
-        let value = &payload_str[value_start + 1..value_end];
-        extracted_values.push(value.to_string());
-    }
-
-    return jwt_field_check(&inp, &extracted_values);
+    return jwt_field_check(&inp, &jwt_struct);
 }
 
 #[derive(Debug, PartialEq)]
@@ -187,8 +163,7 @@ fn main() {
     };
 
     let jwt: String = env::read();
-    let jwt_positions: Vec<usize> = env::read();
-    if !extract_jwt(&jwt, &jwt_positions, &inp) {
+    if !extract_jwt(&jwt, &inp) {
         decision = false;
     }
 

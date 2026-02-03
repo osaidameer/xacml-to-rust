@@ -14,7 +14,7 @@ static EXPONENT: &[u8] = include_bytes!("exponent.bin");
 const JWT_FIELD: &[&str] = &[
 ];
 
-fn extract_jwt(token: &str, positions: &Vec<usize>, inp: &Inputs) -> bool {
+fn extract_jwt(token: &str, inp: &Inputs) -> bool {
     let mut parts = token.split('.');
     let header_b64 = parts.next().expect("jwt header");
     let payload_b64 = parts.next().expect("jwt payload");
@@ -140,8 +140,7 @@ fn main() {
     };
     
     let jwt: String = env::read();
-    let jwt_positions: Vec<usize> = env::read();
-    if !extract_jwt(&jwt, &jwt_positions, &inp) {
+    if !extract_jwt(&jwt, &inp) {
         decision = false;
     }
     
