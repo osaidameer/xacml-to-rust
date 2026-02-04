@@ -60,7 +60,7 @@ fn parse_duration(raw: &str) -> String {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq)]
 enum Result {
     Permit,
     Deny,

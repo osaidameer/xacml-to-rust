@@ -12,7 +12,7 @@ use signature::Verifier;
 
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 struct JwtPayload {
     sub: Option<String>,
     role: Option<String>,
@@ -23,7 +23,7 @@ fn jwt_field_check(inp: &Inputs, jwt: &JwtPayload) -> bool {
     for field in JWT_FIELD.iter() {
         match *field {
             "sub" => {
-                if jwt.sub != Some(inp.access_subject_subject_id) {
+                if jwt.sub != Some(&inp.access_subject_subject_id) {
                     return false;
                 }
             }
@@ -81,7 +81,7 @@ fn parse_time(raw: &str) -> DateTime<FixedOffset> {
     DateTime::parse_from_rfc3339(&input).unwrap()
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq)]
 enum Result {
     Permit,
     Deny,

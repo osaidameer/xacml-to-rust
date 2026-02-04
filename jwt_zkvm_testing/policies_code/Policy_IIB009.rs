@@ -30,7 +30,7 @@ static RE_0D7FE33937DB69EB4A2BFA203B7B3734: &[u8] =
 
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 struct JwtPayload {
     sub: Option<String>,
     role: Option<String>,
@@ -41,7 +41,7 @@ fn jwt_field_check(inp: &Inputs, jwt: &JwtPayload) -> bool {
     for field in JWT_FIELD.iter() {
         match *field {
             "sub" => {
-                if jwt.sub != Some(inp.access_subject_subject_id) {
+                if jwt.sub != Some(&inp.access_subject_subject_id) {
                     return false;
                 }
             }
@@ -95,7 +95,7 @@ fn extract_jwt(token: &str, inp: &Inputs) -> bool {
     return jwt_field_check(&inp, &jwt_struct);
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq)]
 enum Result {
     Permit,
     Deny,

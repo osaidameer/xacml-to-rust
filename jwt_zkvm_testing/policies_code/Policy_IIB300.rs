@@ -11,7 +11,7 @@ use signature::Verifier;
 
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 struct JwtPayload {
     sub: Option<String>,
     role: Option<String>,
@@ -22,7 +22,7 @@ fn jwt_field_check(inp: &Inputs, jwt: &JwtPayload) -> bool {
     for field in JWT_FIELD.iter() {
         match *field {
             "role" => {
-                if jwt.role != Some(inp.access_subject_role) {
+                if jwt.role != Some(&inp.access_subject_role) {
                     return false;
                 }
             }
@@ -76,7 +76,7 @@ fn extract_jwt(token: &str, inp: &Inputs) -> bool {
     return jwt_field_check(&inp, &jwt_struct);
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq)]
 enum Result {
     Permit,
     Deny,

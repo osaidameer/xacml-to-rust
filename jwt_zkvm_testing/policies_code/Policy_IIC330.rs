@@ -46,7 +46,7 @@ fn extract_jwt(token: &str, inp: &Inputs) -> bool {
     return true;
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq)]
 enum Result {
     Permit,
     Deny,

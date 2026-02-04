@@ -51,7 +51,7 @@ fn parse_time(raw: &str) -> DateTime<FixedOffset> {
     DateTime::parse_from_rfc3339(&input).unwrap()
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq)]
 enum Result {
     Permit,
     Deny,

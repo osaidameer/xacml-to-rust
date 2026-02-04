@@ -24,7 +24,7 @@ fn eval_regex(regex_input: &str, regex_exp: &[u8]) -> bool {
 {%- if jwt_fields  %}
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 struct JwtPayload {
     sub: Option<String>,
     role: Option<String>,
@@ -37,16 +37,16 @@ fn jwt_field_check(inp: &Inputs, jwt: &JwtPayload) -> bool {
         {%- for f in jwt_fields %}
             "{{ f }}" => {
                 {%- if f == "sub" %}
-                if jwt.sub != Some(inp.access_subject_subject_id) {
+                if jwt.sub != Some(&inp.access_subject_subject_id) {
                     return false;
                 }
                 {%- elif f == "role" %}
-                if jwt.role != Some(inp.access_subject_role) {
+                if jwt.role != Some(&inp.access_subject_role) {
                     return false;
                 }
                 {%- elif f == "age" %}
                 if let Some(age_str) = &jwt.age {
-                    if age_str.parse() != Ok(inp.access_subject_age) {
+                    if age_str.parse() != Ok(&inp.access_subject_age) {
                         return false;
                     }
                 } else {
