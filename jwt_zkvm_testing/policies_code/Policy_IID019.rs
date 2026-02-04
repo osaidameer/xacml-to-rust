@@ -14,7 +14,6 @@ use serde::Deserialize;
 #[derive(Deserialize)]
 struct JwtPayload {
     sub: Option<String>,
-    role: Option<String>,
     age: Option<String>,
 }
 

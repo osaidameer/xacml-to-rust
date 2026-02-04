@@ -36,8 +36,6 @@ use serde::Deserialize;
 #[derive(Deserialize)]
 struct JwtPayload {
     sub: Option<String>,
-    role: Option<String>,
-    age: Option<String>,
 }
 
 fn jwt_field_check(inp: &Inputs, jwt: &JwtPayload) -> bool {
