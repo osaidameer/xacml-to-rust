@@ -22,7 +22,7 @@ fn jwt_field_check(inp: &Inputs, jwt: &JwtPayload) -> bool {
     for field in JWT_FIELD.iter() {
         match *field {
             "role" => {
-                if jwt.role != Some(&inp.access_subject_role) {
+                if jwt.role.as_deref() != Some(inp.access_subject_role.as_str()) {
                     return false;
                 }
             }

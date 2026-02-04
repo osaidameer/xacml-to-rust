@@ -41,7 +41,7 @@ fn jwt_field_check(inp: &Inputs, jwt: &JwtPayload) -> bool {
     for field in JWT_FIELD.iter() {
         match *field {
             "sub" => {
-                if jwt.sub != Some(&inp.access_subject_subject_id) {
+                if jwt.sub.as_deref() != Some(inp.access_subject_subject_id.as_str()) {
                     return false;
                 }
             }

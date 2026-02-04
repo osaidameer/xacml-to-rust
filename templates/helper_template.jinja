@@ -37,19 +37,16 @@ fn jwt_field_check(inp: &Inputs, jwt: &JwtPayload) -> bool {
         {%- for f in jwt_fields %}
             "{{ f }}" => {
                 {%- if f == "sub" %}
-                if jwt.sub != Some(&inp.access_subject_subject_id) {
+                if jwt.sub.as_deref() != Some(inp.access_subject_subject_id.as_str()) {
                     return false;
                 }
                 {%- elif f == "role" %}
-                if jwt.role != Some(&inp.access_subject_role) {
+                if jwt.role.as_deref() != Some(inp.access_subject_role.as_str()) {
                     return false;
                 }
                 {%- elif f == "age" %}
-                if let Some(age_str) = &jwt.age {
-                    if age_str.parse() != Ok(&inp.access_subject_age) {
-                        return false;
-                    }
-                } else {
+                let age_str = inp.access_subject_age.to_string();
+                if jwt.age.as_deref() != Some(age_str.as_str()) {
                     return false;
                 }
                 {%- else %}
