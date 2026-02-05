@@ -11,17 +11,16 @@ use signature::Verifier;
 
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default)]
 struct JwtPayload {
-    age: Option<String>,
+    age: String,
 }
 
 fn jwt_field_check(inp: &Inputs, jwt: &JwtPayload) -> bool {
     for field in JWT_FIELD.iter() {
         match *field {
             "age" => {
-                let age_str = inp.access_subject_age.to_string();
-                if jwt.age.as_deref() != Some(age_str.as_str()) {
+                if jwt.age.parse() != Ok(inp.access_subject_age) {
                     return false;
                 }
             }

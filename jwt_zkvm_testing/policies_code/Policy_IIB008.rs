@@ -30,16 +30,16 @@ static RE_0D7FE33937DB69EB4A2BFA203B7B3734: &[u8] =
 
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default)]
 struct JwtPayload {
-    sub: Option<String>,
+    sub: String,
 }
 
 fn jwt_field_check(inp: &Inputs, jwt: &JwtPayload) -> bool {
     for field in JWT_FIELD.iter() {
         match *field {
             "sub" => {
-                if jwt.sub.as_deref() != Some(inp.access_subject_subject_id.as_str()) {
+                if jwt.sub != inp.access_subject_subject_id {
                     return false;
                 }
             }

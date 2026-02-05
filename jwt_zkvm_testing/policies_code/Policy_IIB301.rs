@@ -11,16 +11,16 @@ use signature::Verifier;
 
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default)]
 struct JwtPayload {
-    role: Option<String>,
+    role: String,
 }
 
 fn jwt_field_check(inp: &Inputs, jwt: &JwtPayload) -> bool {
     for field in JWT_FIELD.iter() {
         match *field {
             "role" => {
-                if jwt.role.as_deref() != Some(inp.access_subject_role.as_str()) {
+                if jwt.role != inp.access_subject_role {
                     return false;
                 }
             }

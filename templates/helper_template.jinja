@@ -24,16 +24,16 @@ fn eval_regex(regex_input: &str, regex_exp: &[u8]) -> bool {
 {%- if jwt_fields  %}
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default)]
 struct JwtPayload {
 {%- if "sub" in jwt_fields %}
-    sub: Option<String>,
+    sub: String,
 {%- endif %}
 {%- if "role" in jwt_fields %}
-    role: Option<String>,
+    role: String,
 {%- endif %}
 {%- if "age" in jwt_fields %}
-    age: Option<String>,
+    age: String,
 {%- endif %}
 }
 
@@ -43,16 +43,15 @@ fn jwt_field_check(inp: &Inputs, jwt: &JwtPayload) -> bool {
         {%- for f in jwt_fields %}
             "{{ f }}" => {
                 {%- if f == "sub" %}
-                if jwt.sub.as_deref() != Some(inp.access_subject_subject_id.as_str()) {
+                if jwt.sub != inp.access_subject_subject_id {
                     return false;
                 }
                 {%- elif f == "role" %}
-                if jwt.role.as_deref() != Some(inp.access_subject_role.as_str()) {
+                if jwt.role != inp.access_subject_role {
                     return false;
                 }
                 {%- elif f == "age" %}
-                let age_str = inp.access_subject_age.to_string();
-                if jwt.age.as_deref() != Some(age_str.as_str()) {
+                if jwt.age.parse() != Ok(inp.access_subject_age) {
                     return false;
                 }
                 {%- else %}
