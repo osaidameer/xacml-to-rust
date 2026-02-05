@@ -7,8 +7,8 @@ from datetime import datetime
 
 # --- Global Configuration ---
 USE_REQUEST_RESPONSE_FILES = True
-OUTPUT_FOLDER_NAME = "zkvm_testing_without_jwt"
-USE_JWT_FLAG = False
+OUTPUT_FOLDER_NAME = "zkvm_testing_without_rsa"
+USE_JWT_FLAG = True
 # ----------------------------
 
 
