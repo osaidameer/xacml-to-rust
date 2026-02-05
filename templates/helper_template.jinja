@@ -20,7 +20,7 @@ fn eval_regex(regex_input: &str, regex_exp: &[u8]) -> bool {
 {{ regex_claim }}
 {% endfor %}
 
-
+{%- if jwt %}
 {%- if jwt_fields  %}
 use serde::Deserialize;
 
@@ -64,6 +64,7 @@ fn jwt_field_check(inp: &Inputs, jwt: &JwtPayload) -> bool {
     }
     true
 }
+{%- endif %}
 {%- endif %}
 
 {%- if jwt %}
