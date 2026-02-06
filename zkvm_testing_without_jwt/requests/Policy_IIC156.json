@@ -1,0 +1,9 @@
+{
+    "access_subject_subject_id": "Julius Hibbert",
+    "access_subject_test_attr": [
+        "-P5Y3M",
+        "P5Y3M"
+    ],
+    "resource_resource_id": "http://medico.com/record/patient/BartSimpson",
+    "action_action_id": "read"
+}

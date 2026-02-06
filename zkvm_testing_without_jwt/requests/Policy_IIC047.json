@@ -1,0 +1,7 @@
+{
+    "access_subject_subject_id": "Julius Hibbert",
+    "access_subject_licensed_on": "2002-03-22T08:22:47-05:00",
+    "resource_resource_id": "http://medico.com/record/patient/BartSimpson",
+    "action_action_id": "read",
+    "environment_bart_simpson_age": 10
+}

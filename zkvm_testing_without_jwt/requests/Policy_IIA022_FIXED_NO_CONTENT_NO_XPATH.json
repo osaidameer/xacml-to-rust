@@ -1,0 +1,20 @@
+{
+    "access_subject_subject_id": "Julius Hibbert",
+    "access_subject_subject_string": "Julius Hibbert as string",
+    "access_subject_subject_boolean": true,
+    "access_subject_subject_integer": 56,
+    "access_subject_subject_double": 27.5,
+    "access_subject_subject_date": "2002-03-22",
+    "access_subject_subject_dateTime": "2002-03-22T08:23:47-05:00",
+    "access_subject_subject_dayTimeDuration": "P50DT5H4M3S",
+    "access_subject_subject_yearMonthDuration": "-P5Y3M",
+    "access_subject_subject_hexBinary": "0BF7A9876CDE",
+    "access_subject_subject_base64Binary": "c3VyZS4=",
+    "access_subject_subject_rfc822Name": "j_hibbert@MEDICO.COM",
+    "access_subject_subject_x500Name": "cn=Julius Hibbert, o=Medi Corporation, c=US",
+    "access_subject_subject_ipAddress": "122.45.38.245/255.255.255.64:8080",
+    "access_subject_subject_dnsName": "some.host.name:147-874",
+    "resource_resource_id": "http://medico.com/record/patient/BartSimpson",
+    "action_action_id": "read",
+    "environment_current_time": "08:23:47-05:00"
+}

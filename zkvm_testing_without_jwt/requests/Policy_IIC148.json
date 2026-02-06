@@ -1,0 +1,9 @@
+{
+    "access_subject_subject_id": "Julius Hibbert",
+    "access_subject_test_attr": [
+        "BQADgY0AMIGJAoGBAK/yHi+g4nRQ3qKrCZGRYY2feUmVrM0QKOzAdrVnP7vhjamt6oDi2mX00w2L",
+        "BQADgY0AMIGJAoGBFK/yHi+g4nRQ3qKrCZGRYY2feUmVrM0QKOzAdrVnP7vhjamt6oDi2mX00w2L"
+    ],
+    "resource_resource_id": "http://medico.com/record/patient/BartSimpson",
+    "action_action_id": "read"
+}
