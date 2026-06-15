@@ -14,13 +14,14 @@ def main():
     parser.add_argument('-s', '--response',  help='response file')
     parser.add_argument('-j', '--jwt', action="store_true", help='use jwt')
     parser.add_argument('-o', '--output', help='output directory (default: output)')
+    parser.add_argument( '-R', '--rsa', action="store_true", help='use RSA verification inside jwt')
     args = parser.parse_args()
 
     output_dir = args.output or "output"
     basename = os.path.splitext(os.path.basename(args.policy))[0]
     ir = parse_xacml_simple(args.policy)
     crates, fields = generate_input_struct(args.policy, output_path=os.path.join(output_dir, "input_definition", f"{basename}.rs"))
-    generate_policy_code(ir, output_dir=os.path.join(output_dir, "policies_code"), output_file=f"{basename}.rs", crates=crates, fields=fields, jwt=args.jwt)
+    generate_policy_code(ir, output_dir=os.path.join(output_dir, "policies_code"), output_file=f"{basename}.rs", crates=crates, fields=fields, jwt=args.jwt, rsa=args.rsa)
 
     if args.request:
         generate_request_json(request_file=args.request, output_path=os.path.join(output_dir, "requests" ,f"{basename}.json"))

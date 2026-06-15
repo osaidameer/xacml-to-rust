@@ -7,8 +7,9 @@ from datetime import datetime
 
 # --- Global Configuration ---
 USE_REQUEST_RESPONSE_FILES = True
-OUTPUT_FOLDER_NAME = "zkvm_testing_without_rsa"
+OUTPUT_FOLDER_NAME = "zkvm_testing_with_rsa"
 USE_JWT_FLAG = True
+USE_RSA_VERIFY = False
 # ----------------------------
 
 
@@ -112,6 +113,8 @@ for folder in os.listdir(base_dir):
 
         if USE_JWT_FLAG:
             command.append("-j")
+            if USE_RSA_VERIFY:
+                command.append("-R")
 
         # log(f"[INFO] Running command: {' '.join(str(c) for c in command)}")
 

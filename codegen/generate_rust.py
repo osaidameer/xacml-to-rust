@@ -263,7 +263,7 @@ def render_policy(policy, output_dir):
             f.write(v)
     return policy_id, rule_functions, policy_fn, regex_claim
 
-def generate_policy_code(ir, output_dir: str, output_file: str, crates, fields, jwt=False):
+def generate_policy_code(ir, output_dir: str, output_file: str, crates, fields, jwt=False, rsa=False):
     output_path = os.path.join(output_dir, output_file)
     rule_functions = []
     policy_functions = []
@@ -287,6 +287,7 @@ def generate_policy_code(ir, output_dir: str, output_file: str, crates, fields, 
             regex=crates["regex"],
             regex_claims=regex_claim,
             jwt=jwt,
+            rsa=rsa,
             jwt_fields=jwt_fields,
             time=crates["time"],
             duration=crates["duration"],
@@ -331,6 +332,7 @@ def generate_policy_code(ir, output_dir: str, output_file: str, crates, fields, 
             regex=crates["regex"],
             regex_claims=regex_claims,
             jwt=jwt,
+            rsa=rsa,
             jwt_fields=jwt_fields,
             time=crates["time"],
             duration=crates["duration"],

@@ -88,21 +88,23 @@ fn extract_jwt(token: &str, inp: &Inputs) -> bool {
     let payload = engine.decode(payload_b64).expect("payload base64");
     let signature_bytes = engine.decode(signature_b64).expect("signature base64");
 
-    // let n_bytes = engine.decode(MODULUS_B64).expect("modulus base64");
-    // let e_bytes = engine.decode(EXPONENT_B64).expect("exponent base64");
-    // let n = BigUint::from_bytes_be(&n_bytes);
-    // let e = BigUint::from_bytes_be(&e_bytes);
+    {%- if rsa %}
+    let n_bytes = engine.decode(modulus_b64).expect("modulus base64");
+    let e_bytes = engine.decode(exponent_b64).expect("exponent base64");
+    let n = biguint::from_bytes_be(&n_bytes);
+    let e = biguint::from_bytes_be(&e_bytes);
 
-    //let n = BigUint::from_bytes_be(MODULUS);
-    //let e = BigUint::from_bytes_be(EXPONENT);
-    //let public_key = RsaPublicKey::new(n, e).expect("valid RSA public key");
-    //let verifying_key = VerifyingKey::<Sha256>::new(public_key);
-    //let signature = Signature::try_from(signature_bytes.as_slice()).expect("signature format");
+    let n = biguint::from_bytes_be(modulus);
+    let e = biguint::from_bytes_be(exponent);
+    let public_key = rsapublickey::new(n, e).expect("valid rsa public key");
+    let verifying_key = verifyingkey::<sha256>::new(public_key);
+    let signature = signature::try_from(signature_bytes.as_slice()).expect("signature format");
 
-    //let signed_data = format!("{}.{}", header_b64, payload_b64);
-    //verifying_key
-    //    .verify(signed_data.as_bytes(), &signature)
-    //    .expect("RSA signature check");
+    let signed_data = format!("{}.{}", header_b64, payload_b64);
+    verifying_key
+        .verify(signed_data.as_bytes(), &signature)
+        .expect("RSA signature check");
+    {%- endif %}
 
     let payload_str = String::from_utf8(payload).expect("payload utf8");
 
