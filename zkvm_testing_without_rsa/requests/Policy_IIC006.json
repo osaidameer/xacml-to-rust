@@ -1,7 +1,0 @@
-{
-    "access_subject_subject_id": "Bart Simpson",
-    "resource_resource_id": "http://medico.com/record/patient/BartSimpson",
-    "action_action_id": "read",
-    "action_action_approved_by": "Julius Hibbert",
-    "environment_bart_simpson_age": 10
-}

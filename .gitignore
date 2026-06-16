@@ -22,4 +22,5 @@ env/
 
 # Nixos Dev
 .envrc
-.direnv
+.direnvjwt_zkvm_testing
+zkvm_testing_without_rsa

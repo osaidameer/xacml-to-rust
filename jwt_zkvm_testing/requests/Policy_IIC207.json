@@ -1,9 +1,0 @@
-{
-    "access_subject_subject_id": "Julius Hibbert",
-    "access_subject_test_attr": [
-        "urn:oasis:names:tc:xacml:1.0:resource:resource-id",
-        "urn:oasis:names:tc:xacml:1.0:resource:resource-id"
-    ],
-    "resource_resource_id": "http://medico.com/record/patient/BartSimpson",
-    "action_action_id": "read"
-}

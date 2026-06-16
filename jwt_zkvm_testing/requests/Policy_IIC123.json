@@ -1,9 +1,0 @@
-{
-    "access_subject_subject_id": "Julius Hibbert",
-    "access_subject_test_attr": [
-        true,
-        true
-    ],
-    "resource_resource_id": "http://medico.com/record/patient/BartSimpson",
-    "action_action_id": "read"
-}
