@@ -3,6 +3,8 @@ use regex_automata::dfa::{Automaton, dense::DFA};
 use regex_automata::Input;
 
 fn eval_regex(regex_input: &str, regex_exp: &[u8]) -> bool {
+    let aligned = regex_exp.to_vec();
+    let regex_exp = aligned.as_slice();
     match DFA::from_bytes(regex_exp) {
         Ok((dfa, _)) => {
             let input = Input::new(regex_input);
